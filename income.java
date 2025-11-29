@@ -2,9 +2,9 @@ public class income {
     private String Tanggal;
     private String Kategori;
     private String Deskripsi;
-    private String Jumlah; 
+    private double Jumlah; 
 
-    income(String Tanggal, String Kategori, String Deskripsi, String Jumlah){
+    income(String Tanggal, String Kategori, String Deskripsi, double Jumlah){
         this.Tanggal = Tanggal;
         this.Kategori = Kategori;
         this.Deskripsi = Deskripsi;
@@ -20,7 +20,7 @@ public class income {
     public String getDeskripsi(){
         return Deskripsi;
     }
-    public String getJumlah(){
+    public double getJumlah(){
         return Jumlah;
     }
     public void settanggal(String newtanggal){
@@ -32,7 +32,7 @@ public class income {
     public void setdeskripsi(String newdeskripsi){
         this.Deskripsi = newdeskripsi;
     }
-    public void setjumlah(String newjumlah){
+    public void setjumlah(double newjumlah){
         this.Jumlah = newjumlah;
     }
 }
