@@ -121,7 +121,7 @@ public class MoneyTrackerLogin extends JFrame {
         // Login berhasil - buka dashboard
         String fullName = accounts.get(email)[1];
         dispose();
-        System.out.println("login berhasil");
+        new MoneyTrackerDashboard(fullName);
     }
 
     private void handleCreateAccount() {
