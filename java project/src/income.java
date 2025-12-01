@@ -4,7 +4,7 @@ public class income {
     private String Deskripsi;
     private double Jumlah; 
 
-    income(String Tanggal, String Kategori, String Deskripsi, double Jumlah){
+    public income(String Tanggal, String Kategori, String Deskripsi, double Jumlah){
         this.Tanggal = Tanggal;
         this.Kategori = Kategori;
         this.Deskripsi = Deskripsi;
