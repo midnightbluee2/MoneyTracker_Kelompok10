@@ -50,7 +50,7 @@ public class guincomebaru extends JFrame {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                 manager.saveToFile(DATA_FILE);
-                System.out.println("💾 Data otomatis tersimpan saat keluar");
+                System.out.println("Data otomatis tersimpan saat keluar");
             }
         });
     }
