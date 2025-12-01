@@ -1,93 +1,58 @@
-// import javax.swing.*;
-// import java.awt.*;
-
-// public class incomeGUI extends JFrame {
-
-//     private JTextField txtTanggal;
-//     private JTextField txtKategori;
-//     private JTextField txtDeskripsi;
-//     private JTextField txtJumlah;
-
-//     public incomeGUI() {
-
-//         setTitle("INCOME");
-//         setSize(700, 500);
-//         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//         setLocationRelativeTo(null);
-//         getContentPane().setBackground(Color.WHITE);
-
-//         // Panggil tampilan
-//         tampilan();
-
-//         setVisible(true); // tampilkan terakhir
-//     }
-
-//     private void tampilan() {
-
-//         // layout utama
-//         setLayout(new GridLayout(5, 2, 10, 10));
-
-//         // tanggal
-//         add(new JLabel("Tanggal (YYYY-MM-DD):"));
-//         txtTanggal = new JTextField();
-//         add(txtTanggal);
-
-//         // kategori
-//         add(new JLabel("Kategori:"));
-//         txtKategori = new JTextField();
-//         add(txtKategori);
-
-//         // deskripsi
-//         add(new JLabel("Deskripsi:"));
-//         txtDeskripsi = new JTextField();
-//         add(txtDeskripsi);
-
-//         // jumlah
-//         add(new JLabel("Jumlah (Rp):"));
-//         txtJumlah = new JTextField();
-//         add(txtJumlah);
-//     }
-
-//     public static void main(String[] args) {
-//         SwingUtilities.invokeLater(() -> new incomeGUI());
-//     }
-// }
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 
-public class incomegui_lama extends JFrame {
+public class guincomebaru extends JFrame {
     // Komponen GUI
     private JTextField txtTanggal;
     private JTextField txtKategori;
     private JTextField txtDeskripsi;
     private JTextField txtJumlah;
     private JButton btnTambah;
-    private JButton btnHapus;
     private JButton btnClear;
-    private JTable tabelIncome;
-    private DefaultTableModel modelTabel;
     private JLabel labelTotal;
     
-    // IncomeManager
     private IncomeManager manager;
     
-    // Colors
+    // Nama file untuk load
+    private static final String DATA_FILE = "income.dat";
+    
+    // Warna??
     private Color primaryGreen = new Color(76, 175, 80);
     private Color darkGray = new Color(120, 120, 120);
     private Color lightGray = new Color(240, 240, 240);
     
-    public incomegui_lama() {
+    public guincomebaru() {
         manager = new IncomeManager();
+        
+        // AUTO-LOAD DATA SAAT PROGRAM MULAI
+        if (manager.fileExists(DATA_FILE)) {
+            manager.loadFromFile(DATA_FILE);
+            System.out.println("✅ Data dimuat: " + manager.ambilsemuaincome().size() + " transaksi");
+            System.out.println("💰 Total: Rp " + String.format("%,.0f", manager.totalincome()));
+        } else {
+            System.out.println("File data belum ada, mulai dengan data kosong");
+        }
+        
         buatTampilan();
+        
+        // Update total setelah load data
+        updateTabel();
         
         setTitle("INCOME - PEMASUKAN");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         getContentPane().setBackground(Color.WHITE);
+        
+        // AUTO-SAVE SAAT PROGRAM DITUTUP
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                manager.saveToFile(DATA_FILE);
+                System.out.println("💾 Data otomatis tersimpan saat keluar");
+            }
+        });
     }
     
     private void buatTampilan() {
@@ -103,7 +68,7 @@ public class incomegui_lama extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 10, 10, 10);
         
-        // ===== ICON/LOGO PANEL (KIRI) =====
+        //icon panel
         JPanel iconPanel = new JPanel();
         iconPanel.setBackground(Color.WHITE);
         iconPanel.setLayout(new BoxLayout(iconPanel, BoxLayout.Y_AXIS));
@@ -113,7 +78,7 @@ public class incomegui_lama extends JFrame {
         iconIncome.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 120));
         iconIncome.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        JLabel lblTitle = new JLabel("INCOME 🤑", SwingConstants.CENTER);
+        JLabel lblTitle = new JLabel("INCOME", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Arial", Font.BOLD, 24));
         lblTitle.setForeground(primaryGreen);
         lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -130,14 +95,14 @@ public class incomegui_lama extends JFrame {
         gbc.weightx = 0.3;
         mainPanel.add(iconPanel, gbc);
         
-        // ===== FORM PANEL (KANAN) =====
+        // PANEL KANAN
         gbc.gridheight = 1;
         gbc.weightx = 0.7;
         gbc.gridx = 1;
         
-        // Header PENGELUARAN
+        // Header PEMASUKAN
         gbc.gridy = 0;
-        JLabel lblHeader = new JLabel("PENGELUARAN");
+        JLabel lblHeader = new JLabel("PEMASUKAN");
         lblHeader.setFont(new Font("Arial", Font.BOLD, 18));
         lblHeader.setForeground(Color.WHITE);
         lblHeader.setBackground(darkGray);
@@ -187,7 +152,7 @@ public class incomegui_lama extends JFrame {
         
         add(mainPanel, BorderLayout.CENTER);
         
-        // ===== PANEL BAWAH: TABEL & BUTTONS =====
+        //PANEL BAWAH: BUTTONS
         JPanel bottomPanel = new JPanel(new BorderLayout(10, 10));
         bottomPanel.setBackground(Color.WHITE);
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 30, 30, 30));
@@ -195,14 +160,6 @@ public class incomegui_lama extends JFrame {
         // Button Panel
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         btnPanel.setBackground(Color.WHITE);
-        
-        btnHapus = new JButton("Hapus Data");
-        btnHapus.setFont(new Font("Arial", Font.BOLD, 13));
-        btnHapus.setForeground(Color.WHITE);
-        btnHapus.setBackground(new Color(244, 67, 54));
-        btnHapus.setFocusPainted(false);
-        btnHapus.setBorderPainted(false);
-        btnHapus.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         btnClear = new JButton("Clear Form");
         btnClear.setFont(new Font("Arial", Font.BOLD, 13));
@@ -213,27 +170,6 @@ public class incomegui_lama extends JFrame {
         btnClear.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         btnPanel.add(btnClear);
-        btnPanel.add(btnHapus);
-        
-        //Tabel
-        String[] namaKolom = {"No", "Tanggal", "Kategori", "Deskripsi", "Jumlah"};
-        modelTabel = new DefaultTableModel(namaKolom, 0) {
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        
-        tabelIncome = new JTable(modelTabel);
-        tabelIncome.setFont(new Font("Arial", Font.PLAIN, 13));
-        tabelIncome.setRowHeight(30);
-        tabelIncome.setSelectionBackground(new Color(200, 230, 201));
-        tabelIncome.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-        tabelIncome.getTableHeader().setBackground(primaryGreen);
-        tabelIncome.getTableHeader().setForeground(Color.WHITE);
-        tabelIncome.getTableHeader().setPreferredSize(new Dimension(0, 35));
-        
-        JScrollPane scrollPane = new JScrollPane(tabelIncome);
-        scrollPane.setPreferredSize(new Dimension(700, 200));
         
         // Total Panel
         JPanel totalPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -250,18 +186,34 @@ public class incomegui_lama extends JFrame {
         totalPanel.add(labelTotal);
         
         bottomPanel.add(btnPanel, BorderLayout.NORTH);
-        bottomPanel.add(scrollPane, BorderLayout.CENTER);
         bottomPanel.add(totalPanel, BorderLayout.SOUTH);
         
         add(bottomPanel, BorderLayout.SOUTH);
         
-        // ===== EVENT HANDLERS =====
+        // HANDLERS
         btnTambah.addActionListener(e -> tambahData());
-        btnHapus.addActionListener(e -> hapusData());
         btnClear.addActionListener(e -> clearForm());
+        
+        btnTambah.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                btnTambah.setBackground(new Color(90, 90, 90));
+            }
+            public void mouseExited(MouseEvent e) {
+                btnTambah.setBackground(darkGray);
+            }
+        });
+        
+        btnClear.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                btnClear.setBackground(new Color(230, 137, 0));
+            }
+            public void mouseExited(MouseEvent e) {
+                btnClear.setBackground(new Color(255, 152, 0));
+            }
+        });
     }
     
-    // Helper untuk buat rounded text field
+    // buat rounded text field
     private JTextField createRoundedTextField(String placeholder) {
         JTextField txt = new JTextField() {
             @Override
@@ -303,7 +255,7 @@ public class incomegui_lama extends JFrame {
         return txt;
     }
     
-    // Helper untuk rounded component
+    // untuk rounded component
     private void makeRounded(JComponent component, int radius) {
         component.setBorder(new RoundedBorder(radius));
     }
@@ -365,74 +317,38 @@ public class incomegui_lama extends JFrame {
             return;
         }
         
+        // Tambah income
         income incomenya = new income(Tanggal, Kategori, Deskripsi, Jumlah);
         manager.tambahincome(incomenya);
+        
+        // AUTO-SAVE SETIAP TAMBAH DATA
+        manager.saveToFile(DATA_FILE);
+        System.out.println("Data tersimpan otomatis");
         
         updateTabel();
         clearForm();
         
+        // Tampilkan info sukses dengan total
         JOptionPane.showMessageDialog(this, 
-            "Data berhasil ditambahkan!", 
-            "Sukses", 
+            "Data berhasil ditambahkan!\n\n" +
+            "Total Transaksi: " + manager.ambilsemuaincome().size() + "\n" +
+            "Total Pemasukan: Rp " + String.format("%,.0f", manager.totalincome()), 
+            "Berhasil", 
             JOptionPane.INFORMATION_MESSAGE);
-    }
-    
-    private void hapusData() {
-        int barisTerpilih = tabelIncome.getSelectedRow();
-        
-        if (barisTerpilih == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Pilih data yang ingin dihapus!", 
-                "Peringatan", 
-                JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        int konfirmasi = JOptionPane.showConfirmDialog(this, 
-            "Apakah Anda yakin ingin menghapus data ini?", 
-            "Konfirmasi", 
-            JOptionPane.YES_NO_OPTION);
-        
-        if (konfirmasi == JOptionPane.YES_OPTION) {
-            manager.hapusincome(barisTerpilih);
-            //updateTabel();
-            
-            JOptionPane.showMessageDialog(this, 
-                "Data berhasil dihapus!", 
-                "Sukses", 
-                JOptionPane.INFORMATION_MESSAGE);
-        }
     }
     
     private void clearForm() {
         txtTanggal.setText("TANGGAL");
-        txtTanggal.setForeground(Color.BLUE);
+        txtTanggal.setForeground(Color.GRAY);
         txtKategori.setText("KATEGORI");
-        txtKategori.setForeground(Color.BLUE);
+        txtKategori.setForeground(Color.GRAY);
         txtDeskripsi.setText("DESKRIPSI");
-        txtDeskripsi.setForeground(Color.BLUE);
+        txtDeskripsi.setForeground(Color.GRAY);
         txtJumlah.setText("JUMLAH");
-        txtJumlah.setForeground(Color.BLUE);
+        txtJumlah.setForeground(Color.GRAY);
     }
     
     private void updateTabel() {
-        modelTabel.setRowCount(0);
-        ArrayList<income> semuaIncome = manager.ambilsemuaincome();
-        
-        for (int i = 0; i < semuaIncome.size(); i++) {
-            income inc = semuaIncome.get(i);
-            
-            Object[] baris = {
-                (i + 1),
-                inc.getTanggal(),
-                inc.getKategori(),
-                inc.getDeskripsi(),
-                String.format("Rp %,.0f", inc.getJumlah())
-            };
-            
-            modelTabel.addRow(baris);
-        }
-        
         double total = manager.totalincome();
         labelTotal.setText(String.format("Rp %,.0f", total));
     }
@@ -449,7 +365,7 @@ public class incomegui_lama extends JFrame {
         }
         
         SwingUtilities.invokeLater(() -> {
-            incomegui_lama gui = new incomegui_lama();
+            guincomebaru gui = new guincomebaru();
             gui.setVisible(true);
         });
     }

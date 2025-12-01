@@ -1,4 +1,8 @@
-public class income {
+import java.io.Serializable;
+
+public class income implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     private String Tanggal;
     private String Kategori;
     private String Deskripsi;
