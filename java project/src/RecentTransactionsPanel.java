@@ -22,7 +22,7 @@ public class RecentTransactionsPanel extends JPanel {
     // Class pembungkus sederhana untuk menyamakan format data Income & Expense
     private static class Transaction {
         String tanggal;
-        String tipe;     // "Income" atau "Expense"
+        String tipe; // "Income" atau "Expense"
         String kategori;
         double jumlah;
 
@@ -50,7 +50,7 @@ public class RecentTransactionsPanel extends JPanel {
         add(titleLabel, BorderLayout.NORTH);
 
         // Table Setup
-        String[] columnNames = {"Date", "Type", "Category", "Amount"};
+        String[] columnNames = { "Date", "Type", "Category", "Amount" };
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -65,11 +65,12 @@ public class RecentTransactionsPanel extends JPanel {
         table.getTableHeader().setBackground(new Color(163, 181, 101));
         table.getTableHeader().setForeground(Color.WHITE);
 
-        // Custom Cell Renderer untuk warna teks (Hijau untuk Income, Merah untuk Expense)
+        // Custom Cell Renderer untuk warna teks (Hijau untuk Income, Merah untuk
+        // Expense)
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus, int row, int column) {
+                    boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
                 if (!isSelected) {
@@ -97,8 +98,8 @@ public class RecentTransactionsPanel extends JPanel {
         });
 
         // Atur lebar kolom
-        table.getColumnModel().getColumn(0).setPreferredWidth(80);  // Date
-        table.getColumnModel().getColumn(1).setPreferredWidth(60);  // Type
+        table.getColumnModel().getColumn(0).setPreferredWidth(80); // Date
+        table.getColumnModel().getColumn(1).setPreferredWidth(60); // Type
         table.getColumnModel().getColumn(2).setPreferredWidth(100); // Category
         table.getColumnModel().getColumn(3).setPreferredWidth(100); // Amount
 
@@ -118,7 +119,7 @@ public class RecentTransactionsPanel extends JPanel {
         List<Transaction> transactions = getCombinedTransactions(maxTransactions);
 
         if (transactions.isEmpty()) {
-            Object[] emptyRow = {"No transactions yet", "", "", ""};
+            Object[] emptyRow = { "No transactions yet", "", "", "" };
             tableModel.addRow(emptyRow);
             return;
         }
@@ -140,29 +141,31 @@ public class RecentTransactionsPanel extends JPanel {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         // 1. Ambil data dari EXPENSE (Sesuai file Expense.java kamu)
-        List<Expense> expenses = Expense.getDaftarExpense(); 
+        List<Expense> expenses = Expense.getDaftarExpense();
         if (expenses != null) {
             for (Expense exp : expenses) {
                 allTransactions.add(new Transaction(
                         exp.getTanggal(),
                         "Expense",
                         exp.getKategori(),
-                        exp.getJumlah()
-                ));
+                        exp.getJumlah()));
             }
         }
 
         // 2. Ambil data dari INCOME (Sesuai file Income.java kamu)
         // Langsung akses static list dari class Income
-        List<Income> incomes = Income.getDaftarIncomes(); 
-        if (incomes != null) {
-            for (Income inc : incomes) {
-                allTransactions.add(new Transaction(
-                        inc.getTanggal(),
-                        "Income",
-                        inc.getKategori(),
-                        inc.getJumlah()
-                ));
+        IncomeManager manager = IncomeManager.getInstance();
+        if (manager != null) {
+            ArrayList<Income> incomes = manager.ambilsemuaincome();
+            if (incomes != null) {
+                for (Income inc : incomes) {
+                    allTransactions.add(new Transaction(
+                            inc.getTanggal(),
+                            "Income",
+                            inc.getKategori(),
+                            inc.getJumlah()
+                    ));
+                }
             }
         }
 
