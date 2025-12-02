@@ -1,79 +1,148 @@
 import java.util.ArrayList;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.*;
+import java.io.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
-//ini untuk menyimpan data lebih dari satu user
-public class IncomeManager{
-    private ArrayList<income> daftarincome = new ArrayList<>();
+public class IncomeManager {
+    private ArrayList<Income> daftarincomee = new ArrayList<>();
+
+    private static IncomeManager instance = null;
 
     public IncomeManager() {
     }
 
-    public void tambahincome(income newincome) {
-        daftarincome.add(newincome);
+    public void addIncome(Income newIncome) {
+        daftarincomee.add(newIncome);
     }
 
-    public void hapusincome(int index) {
-        if (index >= 0 && index < daftarincome.size()) {
-            daftarincome.remove(index);
+    public boolean removeIncome(int index) {
+        if (index >= 0 && index < daftarincomee.size()) {
+            daftarincomee.remove(index);
+            return true;
         }
-    }
-    public ArrayList<income> ambilsemuaincome(){
-        return daftarincome;
-    }
-
-    public double totalincome() {
-        double total = 0;
-
-        for (income inctotal : daftarincome) {
-            total += inctotal.getJumlah();
-        }
-
-        return total;
-    }
-    public void saveToFile(String filename) {
-        try {
-            FileOutputStream fileOut = new FileOutputStream(filename);
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(daftarincome);
-            out.close();
-            fileOut.close();
-            System.out.println("Data berhasil disimpan ke " + filename);
-        } catch (IOException e) {
-            System.out.println("Error saat menyimpan file: " + e.getMessage());
-            e.printStackTrace();
-        }
+        return false;
     }
     
-    //LOAD DATA DARI FILE
-    @SuppressWarnings("unchecked")
-    public void loadFromFile(String filename) {
+    public ArrayList<Income> ambilsemuaincome() {
+        return daftarincomee;
+    }
+
+    public double totalIncome() {
+        double total = 0;
+        for (Income inc : daftarincomee) {
+            total += inc.getJumlah();
+        }
+        return total;
+    }
+
+    // Method untuk validasi dan penambahan income
+    public String tambahIncome(String tanggal, String kategori, String deskripsi, String jumlahStr) {
         try {
-            FileInputStream fileIn = new FileInputStream(filename);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            daftarincome = (ArrayList<income>) in.readObject();
-            in.close();
-            fileIn.close();
-            System.out.println("Data berhasil dimuat dari " + filename);
-        } catch (FileNotFoundException e) {
-            System.out.println("File tidak ditemukan: " + filename);
-        } catch (IOException e) {
-            System.out.println("Error saat membaca file: " + e.getMessage());
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            System.out.println("Class tidak ditemukan: " + e.getMessage());
-            e.printStackTrace();
+            // Validasi tanggal
+            if (tanggal == null || tanggal.isEmpty() || tanggal.equals("TANGGAL")) {
+                return "Tanggal tidak boleh kosong!";
+            }
+            
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                LocalDate.parse(tanggal, formatter);
+            } catch (DateTimeParseException e) {
+                return "Format tanggal salah! Gunakan format dd-MM-yyyy";
+            }
+            
+            // Validasi kategori
+            if (kategori == null || kategori.isEmpty() || kategori.equals("KATEGORI")) {
+                return "Kategori tidak boleh kosong!";
+            }
+            
+            // Validasi deskripsi
+            if (deskripsi == null || deskripsi.isEmpty() || deskripsi.equals("DESKRIPSI")) {
+                deskripsi = "-";
+            }
+            
+            // Validasi jumlah
+            double jumlah;
+            try {
+                jumlah = Double.parseDouble(jumlahStr);
+                if (jumlah <= 0) {
+                    return "Jumlah harus lebih besar dari 0!";
+                }
+            } catch (NumberFormatException e) {
+                return "Jumlah harus berupa angka!";
+            }
+            
+            // Tambahkan income
+            Income income = new Income(tanggal, kategori, deskripsi, jumlah);
+            addIncome(income);
+            return "SUCCESS";
+            
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
         }
     }
-    public boolean fileExists(String filename) {
-        File file = new File(filename);
-        return file.exists();
-    }
-}
 
+    // Save/Load methods
+    public void saveData(String username) throws IOException {
+        File folder = new File("data");
+        if (!folder.exists())
+            folder.mkdir();
+            
+        String fileName = "data/" + username + "_income.dat";
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName));
+        oos.writeObject(daftarincomee);
+        oos.close();
+    }
+
+    @SuppressWarnings("unchecked")
+    public void loadData(String username) throws IOException, ClassNotFoundException {
+        String fileName = "data/" + username + "_income.dat";
+        File file = new File(fileName);
+        
+        if (!file.exists()) {
+            daftarincomee = new ArrayList<>();
+            return;
+        }
+        
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName));
+        daftarincomee = (ArrayList<Income>) ois.readObject();
+        ois.close();
+    }
+
+    // add
+    public static void setInstance(IncomeManager manager) {
+        instance = manager;
+    }
+
+    // Get instance yang sedang digunakan
+    public static IncomeManager getInstance() {
+        if (instance == null) {
+            instance = new IncomeManager();
+        }
+        return instance;
+    }
+
+    // Static method untuk get total income
+    public static double getTotalIncome() {
+        if (instance == null) {
+            return 0.0;
+        }
+        return instance.totalIncome();
+    }
+
+    // Static method untuk load dari file
+    public static void loadFromFile(String username) throws IOException, ClassNotFoundException {
+        if (instance == null) {
+            instance = new IncomeManager();
+        }
+        instance.loadData(username);
+    }
+
+    // Static method untuk save ke file
+    public static void saveToFile(String username) throws IOException {
+        if (instance != null) {
+            instance.saveData(username);
+        }
+    }
+
+}

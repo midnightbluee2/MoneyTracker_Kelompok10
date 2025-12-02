@@ -5,61 +5,63 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-public class ExpenseGUI extends JFrame {
-    private JSpinner dateSpinner; // ✅ Ganti dari TextField ke Spinner
-    private JComboBox<String> cmbKategori; // ✅ Ganti dari TextField ke ComboBox
-    private JTextField txtKategoriLain; // ✅ Field tambahan untuk "Lain-lain"
+public class Incomegui_lama extends JFrame {
+    private JSpinner dateSpinner; 
+    private JComboBox<String> cmbKategori; 
+    private JTextField txtKategoriLain; 
     private JTextField txtDeskripsi;
     private JTextField txtJumlah;
     private JButton btnTambah;
     private JButton btnHapus;
     private JButton btnClear;
     private JButton btnBack; 
-    private JTable tabelExpense;
+    private JTable tabelIncome;
     private DefaultTableModel modelTabel;
     private JLabel labelTotal;
 
+    private IncomeManager manager;
     private String currentUsername;
-    private Runnable onCloseCallback; // Callback untuk dashboard
-    
-    private Color primaryRed = new Color(244, 67, 54);
+    private Runnable onCloseCallback; 
+
+    private Color primaryGreen = new Color(76, 175, 80);
     private Color darkGray = new Color(120, 120, 120);
     private Color lightGray = new Color(240, 240, 240);
 
-    // Constructor dengan callback
-    public ExpenseGUI(String username, Runnable onCloseCallback) {
-        this.currentUsername = username;
+    // constructor dengan callback
+    public Incomegui_lama(String namauser, Runnable onCloseCallback) {
+        this.currentUsername = namauser;
         this.onCloseCallback = onCloseCallback;
-        
+        manager = new IncomeManager();
+        IncomeManager.setInstance(manager);
+
         try {
-            Expense.loadFromFile(currentUsername);
-            System.out.println("Data Expense untuk " + currentUsername + " berhasil dimuat.");
+            manager.loadData(currentUsername);
+            System.out.println("Data Income untuk " + currentUsername + " berhasil dimuat.");
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("File data Expense belum ada, memulai dengan data kosong.");
+            System.out.println("File data Income belum ada, memulai dengan data kosong.");
         }
-        
+
         buatTampilan();
-        
-        setTitle("EXPENSE");
-        setSize(500, 700);  
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); 
+
+
+        setTitle("INCOME");
+        setSize(500, 700);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); // 
         setLocationRelativeTo(null);
         setResizable(false);
+
         
-        
-        setContentPane(new GradientColor(new Color(255, 245, 245), new Color(255, 224, 224)));
-        buatTampilan(); 
-        
+        setContentPane(new GradientColor(new Color(240, 255, 240), new Color(200, 230, 200)));
+        buatTampilan();
         updateTabel();
-        
-        // Handle clode
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                handleBack(); // Sama seperti tombol Back
+                handleBack();
             }
         });
     }
@@ -69,7 +71,7 @@ public class ExpenseGUI extends JFrame {
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new GridBagLayout());
-        mainPanel.setOpaque(false); 
+        mainPanel.setOpaque(false); // 
         mainPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 20, 30));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -81,21 +83,21 @@ public class ExpenseGUI extends JFrame {
         iconPanel.setOpaque(false);
         iconPanel.setLayout(new BoxLayout(iconPanel, BoxLayout.Y_AXIS));
 
-        JLabel iconExpense = new JLabel("💸", SwingConstants.CENTER);
-        iconExpense.setFont(new Font("SansSerif", Font.PLAIN, 80));
-        iconExpense.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel iconIncome = new JLabel("💰", SwingConstants.CENTER);
+        iconIncome.setFont(new Font("SansSerif", Font.PLAIN, 80));
+        iconIncome.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel lblTitle = new JLabel("EXPENSE", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("SansSerif", Font.BOLD, 24));
-        lblTitle.setForeground(primaryRed);
-        lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
         JLabel lblUsername = new JLabel("Hi, " + currentUsername + "!", SwingConstants.CENTER);
         lblUsername.setFont(new Font("SansSerif", Font.PLAIN, 14));
         lblUsername.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        JLabel lblTitle = new JLabel("INCOME", SwingConstants.CENTER);
+        lblTitle.setFont(new Font("SansSerif", Font.BOLD, 24));
+        lblTitle.setForeground(primaryGreen);
+        lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         iconPanel.add(Box.createVerticalGlue());
-        iconPanel.add(iconExpense);
+        iconPanel.add(iconIncome);
         iconPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         iconPanel.add(lblTitle);
         iconPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -104,7 +106,7 @@ public class ExpenseGUI extends JFrame {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridheight = 6; // kategori lain
+        gbc.gridheight = 6;
         gbc.weightx = 0.2;
         mainPanel.add(iconPanel, gbc);
 
@@ -114,18 +116,18 @@ public class ExpenseGUI extends JFrame {
 
         // Header
         gbc.gridy = 0;
-        JLabel lblHeader = new JLabel("EXPENSE");
+        JLabel lblHeader = new JLabel("INCOME");
         lblHeader.setFont(new Font("SansSerif", Font.BOLD, 18));
         lblHeader.setForeground(Color.WHITE);
         lblHeader.setBackground(darkGray);
         lblHeader.setOpaque(true);
         lblHeader.setHorizontalAlignment(SwingConstants.CENTER);
-        lblHeader.setPreferredSize(new Dimension(300, 45));
+        lblHeader.setPreferredSize(new Dimension(400, 45));
         lblHeader.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         makeRounded(lblHeader, 25);
         mainPanel.add(lblHeader, gbc);
 
-        // data spinner (agar tidak tulis manual)
+        // date spinner (bukan isi manual)
         gbc.gridy = 1;
         dateSpinner = createDateSpinner();
         mainPanel.add(dateSpinner, gbc);
@@ -135,14 +137,14 @@ public class ExpenseGUI extends JFrame {
         cmbKategori = createKategoriComboBox();
         mainPanel.add(cmbKategori, gbc);
 
-        // kategori lain
+        // untuk kategori lain
         gbc.gridy = 3;
         txtKategoriLain = createRoundedTextField("Ketik kategori lain...");
         txtKategoriLain.setVisible(false);
         mainPanel.add(txtKategoriLain, gbc);
 
         gbc.gridy = 4;
-        txtDeskripsi = createRoundedTextField("DESKRIPSI (Optsional)");
+        txtDeskripsi = createRoundedTextField("DESKRIPSI (Optional)");
         mainPanel.add(txtDeskripsi, gbc);
 
         gbc.gridy = 5;
@@ -160,15 +162,15 @@ public class ExpenseGUI extends JFrame {
         btnPanel.setOpaque(false);
 
         btnTambah = new JButton("Add Data");
-        btnTambah.setFont(new Font("Arial", Font.BOLD, 13));
+        btnTambah.setFont(new Font("SansSerif", Font.BOLD, 13));
         btnTambah.setForeground(Color.WHITE);
-        btnTambah.setBackground(primaryRed);
+        btnTambah.setBackground(primaryGreen);
         btnTambah.setFocusPainted(false);
         btnTambah.setBorderPainted(false);
         btnTambah.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         btnClear = new JButton("Clear");
-        btnClear.setFont(new Font("Arial", Font.BOLD, 13));
+        btnClear.setFont(new Font("SansSerif", Font.BOLD, 13));
         btnClear.setForeground(Color.WHITE);
         btnClear.setBackground(new Color(255, 152, 0));
         btnClear.setFocusPainted(false);
@@ -176,14 +178,14 @@ public class ExpenseGUI extends JFrame {
         btnClear.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         btnHapus = new JButton("Delete");
-        btnHapus.setFont(new Font("Arial", Font.BOLD, 13));
+        btnHapus.setFont(new Font("SansSerif", Font.BOLD, 13));
         btnHapus.setForeground(Color.WHITE);
-        btnHapus.setBackground(new Color(33, 33, 33));
+        btnHapus.setBackground(new Color(244, 67, 54));
         btnHapus.setFocusPainted(false);
         btnHapus.setBorderPainted(false);
         btnHapus.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Button Back
+        // ✅ TOMBOL BACK
         btnBack = new JButton("Back");
         btnBack.setFont(new Font("SansSerif", Font.BOLD, 13));
         btnBack.setForeground(Color.WHITE);
@@ -195,7 +197,7 @@ public class ExpenseGUI extends JFrame {
         btnPanel.add(btnTambah);
         btnPanel.add(btnClear);
         btnPanel.add(btnHapus);
-        btnPanel.add(btnBack); 
+        btnPanel.add(btnBack);
 
         String[] namaKolom = { "No", "Tanggal", "Kategori", "Deskripsi", "Jumlah" };
         modelTabel = new DefaultTableModel(namaKolom, 0) {
@@ -204,14 +206,14 @@ public class ExpenseGUI extends JFrame {
             }
         };
 
-        tabelExpense = new JTable(modelTabel);
-        tabelExpense.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        tabelExpense.setRowHeight(30);
-        tabelExpense.setSelectionBackground(new Color(255, 205, 210));
-        tabelExpense.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
-        tabelExpense.getTableHeader().setBackground(primaryRed);
-        tabelExpense.getTableHeader().setForeground(Color.WHITE);
-        tabelExpense.getTableHeader().setPreferredSize(new Dimension(0, 35));
+        tabelIncome = new JTable(modelTabel);
+        tabelIncome.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        tabelIncome.setRowHeight(30);
+        tabelIncome.setSelectionBackground(new Color(200, 230, 201));
+        tabelIncome.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
+        tabelIncome.getTableHeader().setBackground(primaryGreen);
+        tabelIncome.getTableHeader().setForeground(Color.WHITE);
+        tabelIncome.getTableHeader().setPreferredSize(new Dimension(0, 35));
 
         DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
             @Override
@@ -237,14 +239,14 @@ public class ExpenseGUI extends JFrame {
             }
         };
 
-        for (int i = 0; i < tabelExpense.getColumnCount(); i++) {
-            tabelExpense.getColumnModel().getColumn(i).setCellRenderer(cellRenderer);
+        for (int i = 0; i < tabelIncome.getColumnCount(); i++) {
+            tabelIncome.getColumnModel().getColumn(i).setCellRenderer(cellRenderer);
         }
-        
-        tabelExpense.getColumnModel().getColumn(0).setPreferredWidth(30);
-        tabelExpense.getColumnModel().getColumn(4).setPreferredWidth(120);
 
-        JScrollPane scrollPane = new JScrollPane(tabelExpense);
+        tabelIncome.getColumnModel().getColumn(0).setPreferredWidth(30);
+        tabelIncome.getColumnModel().getColumn(4).setPreferredWidth(120);
+
+        JScrollPane scrollPane = new JScrollPane(tabelIncome);
         scrollPane.setPreferredSize(new Dimension(700, 250));
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
@@ -252,12 +254,12 @@ public class ExpenseGUI extends JFrame {
         JPanel totalPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         totalPanel.setOpaque(false);
 
-        JLabel lblTotalText = new JLabel("Total Pengeluaran: ");
+        JLabel lblTotalText = new JLabel("Total Pemasukan: ");
         lblTotalText.setFont(new Font("SansSerif", Font.BOLD, 16));
 
         labelTotal = new JLabel("Rp 0");
         labelTotal.setFont(new Font("SansSerif", Font.BOLD, 18));
-        labelTotal.setForeground(primaryRed);
+        labelTotal.setForeground(primaryGreen);
 
         totalPanel.add(lblTotalText);
         totalPanel.add(labelTotal);
@@ -272,10 +274,10 @@ public class ExpenseGUI extends JFrame {
         btnTambah.addActionListener(e -> tambahData());
         btnHapus.addActionListener(e -> hapusData());
         btnClear.addActionListener(e -> clearForm());
-        btnBack.addActionListener(e -> handleBack()); 
+        btnBack.addActionListener(e -> handleBack());
     }
 
-    // Untuk tanggal (data spinner)
+    // untuk date spinner
     private JSpinner createDateSpinner() {
         SpinnerDateModel model = new SpinnerDateModel();
         JSpinner spinner = new JSpinner(model);
@@ -290,14 +292,14 @@ public class ExpenseGUI extends JFrame {
         return spinner;
     }
 
-    // Kategori (combo box)
+    // untuk kategori
     private JComboBox<String> createKategoriComboBox() {
         String[] kategori = {
-            "Makan & Minum",
-            "Transportasi",
-            "Kesehatan",
-            "Pendidikan",
-            "Kecantikan",
+            "Gaji",
+            "Uang Saku",
+            "Investasi",
+            "Hadiah",
+            "Freelance",
             "Lain-lain"
         };
         
@@ -306,7 +308,6 @@ public class ExpenseGUI extends JFrame {
         combo.setPreferredSize(new Dimension(400, 45));
         combo.setBackground(lightGray);
         
-        // Untuk kategori lain lain
         combo.addActionListener(e -> {
             if (combo.getSelectedItem().equals("Lain-lain")) {
                 txtKategoriLain.setVisible(true);
@@ -322,7 +323,7 @@ public class ExpenseGUI extends JFrame {
         
         return combo;
     }
-    
+
     private JTextField createRoundedTextField(String placeholder) {
         JTextField txt = new JTextField() {
             @Override
@@ -388,7 +389,7 @@ public class ExpenseGUI extends JFrame {
     }
 
     private void tambahData() {
-        // ambil tanggal dari spinner
+        // data snipper
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         String tanggal = sdf.format((Date) dateSpinner.getValue());
         
@@ -405,32 +406,39 @@ public class ExpenseGUI extends JFrame {
             }
         }
         
-        String deskripsi = txtDeskripsi.getText().trim();
+        String deskripsi = txtDeskripsi.getText().trim().equals("DESKRIPSI (Optional)") ? "-"
+                : txtDeskripsi.getText().trim();
         String jumlahText = txtJumlah.getText().trim();
 
-        if (deskripsi.equals("DESKRIPSI (Optional)")) deskripsi = "";
-        if (jumlahText.equals("JUMLAH (Angka tanpa koma)")) jumlahText = "";
-        
-        String result = InputExpense.tambahExpense(tanggal, kategori, deskripsi, jumlahText);
-
-        if (InputExpense.isSuccess(result)) {
-            updateTabel();
-            clearForm();
-
+        if (jumlahText.equals("JUMLAH (Angka tanpa koma)")) {
             JOptionPane.showMessageDialog(this,
+                    "Field Jumlah wajib diisi!",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String result = manager.tambahIncome(tanggal, kategori, deskripsi, jumlahText);
+
+        if (!result.equals("SUCCESS")) {
+            JOptionPane.showMessageDialog(this,
+                    result,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        updateTabel();
+        clearForm();
+
+        JOptionPane.showMessageDialog(this,
                 "Data berhasil ditambahkan!",
                 "Sukses",
                 JOptionPane.INFORMATION_MESSAGE);
-        } else {
-             JOptionPane.showMessageDialog(this,
-                "Error: " + result,
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-        }
     }
 
     private void hapusData() {
-        int barisTerpilih = tabelExpense.getSelectedRow();
+        int barisTerpilih = tabelIncome.getSelectedRow();
 
         if (barisTerpilih == -1) {
             JOptionPane.showMessageDialog(this,
@@ -446,25 +454,24 @@ public class ExpenseGUI extends JFrame {
                 JOptionPane.YES_NO_OPTION);
 
         if (konfirmasi == JOptionPane.YES_OPTION) {
-            boolean success = Expense.removeExpense(barisTerpilih);
-
+            boolean success = manager.removeIncome(barisTerpilih);
             if (success) {
                 updateTabel();
                 JOptionPane.showMessageDialog(this,
-                    "Data berhasil dihapus!",
-                    "Sukses",
-                    JOptionPane.INFORMATION_MESSAGE);
+                        "Data berhasil dihapus!",
+                        "Sukses",
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this,
-                    "Gagal menghapus data!",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+                        "Gagal menghapus data!",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
     private void clearForm() {
-        dateSpinner.setValue(new Date()); // Reset ke hari ini
+        dateSpinner.setValue(new Date());
         cmbKategori.setSelectedIndex(0);
         txtKategoriLain.setVisible(false);
         txtDeskripsi.setText("DESKRIPSI (Opsional)");
@@ -475,42 +482,44 @@ public class ExpenseGUI extends JFrame {
 
     private void updateTabel() {
         modelTabel.setRowCount(0);
-        
-        List<Expense> semuaExpense = Expense.getDaftarExpense();
+        ArrayList<Income> semuaIncome = manager.ambilsemuaincome();
 
-        for (int i = 0; i < semuaExpense.size(); i++) {
-            Expense exp = semuaExpense.get(i);
+        for (int i = 0; i < semuaIncome.size(); i++) {
+            Income inc = semuaIncome.get(i);
 
             Object[] baris = {
                     (i + 1),
-                    exp.getTanggal(),
-                    exp.getKategori(),
-                    exp.getDeskripsi(),
-                    String.format("Rp %,.0f", exp.getJumlah())
+                    inc.getTanggal(),
+                    inc.getKategori(),
+                    inc.getDeskripsi(),
+                    String.format("Rp %,.0f", inc.getJumlah())
             };
 
             modelTabel.addRow(baris);
         }
 
-        double total = Expense.getTotalExpense();
+        double total = manager.totalIncome();
         labelTotal.setText(String.format("Rp %,.0f", total));
     }
 
-    // handle tombol back
+    public IncomeManager getManager() {
+        return manager;
+    }
+
+    // Untuk back
     private void handleBack() {
         try {
-            Expense.saveToFile(currentUsername);
-            System.out.println("Data Expense berhasil disimpan untuk " + currentUsername);
+            manager.saveData(currentUsername);
+            System.out.println("Data Income berhasil disimpan untuk " + currentUsername);
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Gagal menyimpan data!", "Error Simpan", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Gagal menyimpan data!", "Error Simpan", JOptionPane.ERROR_MESSAGE);
         }
         
-        // Panggil callback untuk kembali ke dashboard
         if (onCloseCallback != null) {
             onCloseCallback.run();
         }
         
-        dispose(); 
+        dispose();
     }
 }

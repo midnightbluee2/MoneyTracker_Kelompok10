@@ -1,22 +1,20 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MoneyTrackerLogin extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
-    private Map<String, String[]> accounts = new HashMap<>(); // email -> [password, fullName]
 
     private JTextField loginEmail, signupEmail, signupName;
     private JPasswordField loginPassword, signupPassword;
 
     public MoneyTrackerLogin() {
         setTitle("Money Tracker");
-        setSize(900, 600);
+        setSize(500, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setResizable(false);
 
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
@@ -29,28 +27,34 @@ public class MoneyTrackerLogin extends JFrame {
     }
 
     private JPanel createLoginPanel() {
-        JPanel panel = createGradientPanel();
+        Color colorTop = new Color(184, 142, 167);
+        Color colorBottom = new Color(227, 216, 206);
+
+        JPanel panel = createGradientPanel(colorTop, colorBottom);
         panel.setLayout(null);
 
-        JPanel card = createCard(100, 80, new Color(100, 149, 237, 230));
+        JPanel card = createCard(100, 80, new Color(69, 83, 120, 230));
 
         addLabel(card, "Welcome Back!", 28, Font.BOLD, 50, 30);
         addLabel(card, "Login to continue", 14, Font.PLAIN, 50, 65);
 
         addLabel(card, "Email", 14, Font.PLAIN, 40, 110);
-        loginEmail = addTextField(card, 40, 135, new Color(100, 149, 237));
+        loginEmail = addTextField(card, 40, 135, new Color(69, 83, 120, 230));
 
         addLabel(card, "Password", 14, Font.PLAIN, 40, 185);
-        loginPassword = addPasswordField(card, 40, 210, new Color(100, 149, 237));
+        loginPassword = addPasswordField(card, 40, 210, new Color(69, 83, 120, 230));
 
         JLabel forgot = addLabel(card, "forgot password?", 12, Font.PLAIN, 40, 250);
         forgot.setCursor(new Cursor(Cursor.HAND_CURSOR));
         forgot.setHorizontalAlignment(SwingConstants.CENTER);
         forgot.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent e) { handleForgotPassword(); }
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                handleForgotPassword();
+            }
         });
 
-        JButton loginBtn = createButton("LOGIN", 70, 300, new Color(47, 79, 79));
+        JButton loginBtn = createButton("LOGIN", 70, 300, new Color(255, 192, 203));
+        loginBtn.setForeground(new Color(69, 83, 120, 230));
         loginBtn.addActionListener(e -> handleLogin());
         card.add(loginBtn);
 
@@ -58,7 +62,9 @@ public class MoneyTrackerLogin extends JFrame {
         signup.setCursor(new Cursor(Cursor.HAND_CURSOR));
         signup.setHorizontalAlignment(SwingConstants.CENTER);
         signup.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent e) { cardLayout.show(mainPanel, "signup"); }
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                cardLayout.show(mainPanel, "signup");
+            }
         });
 
         panel.add(card);
@@ -66,10 +72,13 @@ public class MoneyTrackerLogin extends JFrame {
     }
 
     private JPanel createSignupPanel() {
-        JPanel panel = createGradientPanel();
+        Color colorTop = new Color(227, 216, 206);
+        Color colorBottom = new Color(184, 142, 167);
+
+        JPanel panel = createGradientPanel(colorTop, colorBottom);
         panel.setLayout(null);
 
-        JPanel card = createCard(500, 80, new Color(47, 79, 79, 230));
+        JPanel card = createCard(100, 80, new Color(47, 79, 79, 230));
 
         addLabel(card, "Create Account", 26, Font.BOLD, 50, 30);
 
@@ -91,7 +100,9 @@ public class MoneyTrackerLogin extends JFrame {
         login.setCursor(new Cursor(Cursor.HAND_CURSOR));
         login.setHorizontalAlignment(SwingConstants.CENTER);
         login.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent e) { cardLayout.show(mainPanel, "login"); }
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                cardLayout.show(mainPanel, "login");
+            }
         });
 
         panel.add(card);
@@ -107,21 +118,23 @@ public class MoneyTrackerLogin extends JFrame {
             return;
         }
 
-        if (!accounts.containsKey(email)) {
+        // ✅ PERUBAHAN: UserInformation → UserManager
+        if (!UserManager.accountExists(email)) {
             showMessage("Account not found!", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        if (!accounts.get(email)[0].equals(password)) {
+        // ✅ PERUBAHAN: UserInformation → UserManager
+        if (!UserManager.validateLogin(email, password)) {
             showMessage("Incorrect password!", JOptionPane.ERROR_MESSAGE);
             loginPassword.setText("");
             return;
         }
 
-        // Login berhasil - buka dashboard
-        String fullName = accounts.get(email)[1];
-        dispose();
-        new MoneyTrackerDashboard(fullName);
+        // Login berhasil
+        // ✅ PERUBAHAN: UserInformation → UserManager
+        String fullName = UserManager.getFullName(email);
+        openDashboard(fullName);
     }
 
     private void handleCreateAccount() {
@@ -139,12 +152,14 @@ public class MoneyTrackerLogin extends JFrame {
             return;
         }
 
-        if (accounts.containsKey(email)) {
+        // ✅ PERUBAHAN: UserInformation → UserManager
+        if (UserManager.accountExists(email)) {
             showMessage("Email already registered!", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        accounts.put(email, new String[]{password, fullName});
+        // ✅ PERUBAHAN: UserInformation → UserManager
+        UserManager.createAccount(email, password, fullName);
         showMessage("Account created successfully!", JOptionPane.INFORMATION_MESSAGE);
 
         signupEmail.setText("");
@@ -157,16 +172,18 @@ public class MoneyTrackerLogin extends JFrame {
         String email = JOptionPane.showInputDialog(this, "Enter your email:",
                 "Forgot Password", JOptionPane.QUESTION_MESSAGE);
 
-        if (email == null || email.trim().isEmpty()) return;
+        if (email == null || email.trim().isEmpty())
+            return;
 
-        if (!accounts.containsKey(email.trim())) {
+        // ✅ PERUBAHAN: UserInformation → UserManager
+        if (!UserManager.accountExists(email.trim())) {
             showMessage("Email not found!", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         JPasswordField newPass = new JPasswordField();
         JPasswordField confirmPass = new JPasswordField();
-        Object[] message = {"New password:", newPass, "Confirm:", confirmPass};
+        Object[] message = { "New password:", newPass, "Confirm:", confirmPass };
 
         int option = JOptionPane.showConfirmDialog(this, message, "Reset Password",
                 JOptionPane.OK_CANCEL_OPTION);
@@ -180,20 +197,66 @@ public class MoneyTrackerLogin extends JFrame {
                 return;
             }
 
-            accounts.get(email.trim())[0] = newPassword;
+            // ✅ PERUBAHAN: UserInformation → UserManager
+            UserManager.updatePassword(email.trim(), newPassword);
             showMessage("Password reset successful!", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
-    private JPanel createGradientPanel() {
+    private void openDashboard(String fullName) {
+        // ✅ PERUBAHAN: UserInformation → UserManager
+        UserManager.login(fullName);
+
+        // Load data untuk user ini
+        try {
+            Expense.loadFromFile(fullName);
+            IncomeManager.loadFromFile(fullName);
+            System.out.println("Data loaded for: " + fullName);
+        } catch (Exception e) {
+            System.out.println("Starting with empty data for: " + fullName);
+        }
+
+        // Tutup login window
+        dispose();
+
+        // Buka dashboard window
+        SwingUtilities.invokeLater(() -> {
+            JFrame dashboardFrame = new JFrame("Money Tracker - Dashboard");
+            DashboardGUI dashboard = new DashboardGUI(fullName);
+
+            dashboardFrame.add(dashboard);
+            dashboardFrame.setSize(500, 700);
+            dashboardFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            dashboardFrame.setLocationRelativeTo(null);
+            dashboardFrame.setResizable(false);
+
+            // Auto-save data saat tutup aplikasi
+            dashboardFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent e) {
+                    try {
+                        Expense.saveToFile(fullName);
+                        IncomeManager.saveToFile(fullName);
+                        System.out.println("Data saved for: " + fullName);
+                    } catch (Exception ex) {
+                        System.err.println("Error saving data: " + ex.getMessage());
+                    }
+                }
+            });
+
+            dashboardFrame.setVisible(true);
+        });
+    }
+
+    private JPanel createGradientPanel(Color colorTop, Color colorBottom) {
         return new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                GradientPaint gradient = new GradientPaint(0, 0, new Color(255, 192, 203),
-                        getWidth(), getHeight(), new Color(135, 206, 250));
+
+                GradientPaint gradient = new GradientPaint(0, 0, colorTop, getWidth(), getHeight(), colorBottom);
                 g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
             }

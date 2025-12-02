@@ -1,17 +1,15 @@
 import java.io.*;
 import java.util.*;
 
-public class Expense implements Serializable {   // Serializable agar bisa disimpan ke file
+public class Expense implements Serializable {
 
-    private String tanggal;     // Menyimpan tanggal pengeluaran
-    private String kategori;    // Menyimpan kategori
+    private String tanggal;
+    private String kategori;
     private String deskripsi;
-    private double jumlah;      // Menyimpan nominal uang
+    private double jumlah;
 
-    private static final String FILE_NAME = "expense.dat";  //nama file penyimpanan
-    private static List<Expense> daftarExpense = new ArrayList<>(); //menyimpan semua data expense
+    private static List<Expense> daftarExpense = new ArrayList<>();
 
-    //Constructor yang dipanggil saat membuat object Expense baru
     public Expense(String tanggal, String kategori, String deskripsi, double jumlah) {
         this.tanggal = tanggal;
         this.kategori = kategori;
@@ -19,17 +17,17 @@ public class Expense implements Serializable {   // Serializable agar bisa disim
         this.jumlah = jumlah;
     }
 
-    //Getter untuk mengambil seluruh daftar expense
+    // Getter list
     public static List<Expense> getDaftarExpense() {
         return daftarExpense;
     }
 
-    //menambahkan object expense ke list
+    // Tambah data
     public static void addExpense(Expense expense) {
         daftarExpense.add(expense);
     }
 
-    //menghapus item expense
+    // Hapus data
     public static boolean removeExpense(int index) {
         if (index >= 0 && index < daftarExpense.size()) {
             daftarExpense.remove(index);
@@ -38,34 +36,60 @@ public class Expense implements Serializable {   // Serializable agar bisa disim
         return false;
     }
 
-    //Menghitung total semua pengeluaran
+    // Total pengeluaran
     public static double getTotalExpense() {
         return daftarExpense.stream()
-                .mapToDouble(e -> e.jumlah)  // Mengambil field jumlah setiap expense
-                .sum();                      // Menjumlahkan semuanya
+                .mapToDouble(e -> e.jumlah)
+                .sum();
     }
+    public static void saveToFile(String username) throws IOException {
+        File folder = new File("data");
+        if (!folder.exists()) folder.mkdir();
 
-    //menyimpan list expense ke file .dat
-    public static void saveToFile() throws IOException {
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_NAME));
+        String fileName = "data/" + username + "_expense.dat";
+
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName));
         oos.writeObject(daftarExpense);
         oos.close();
     }
 
-    // untuk membaca data dari file saat program dimulai
-    public static void loadFromFile() throws IOException, ClassNotFoundException {
-        File file = new File(FILE_NAME);
-        if (!file.exists()) return;  //jika file belum ada, tidak perlu load
+    public static void loadFromFile(String username)
+            throws IOException, ClassNotFoundException {
 
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME));
-        daftarExpense = (List<Expense>) ois.readObject();  //untuk mengambil list dari file
+        String fileName = "data/" + username + "_expense.dat";
+
+        File file = new File(fileName);
+        if (!file.exists()) {
+            daftarExpense = new ArrayList<>();
+            return;
+        }
+
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName));
+        daftarExpense = (List<Expense>) ois.readObject();
         ois.close();
     }
 
-    //Format tampilan data
     @Override
     public String toString() {
         return tanggal + " | " + kategori + " | " + deskripsi + " | Rp " +
                 String.format("%,.0f", jumlah);
     }
+
+    // ======= Getter methods for Expense (used by ExpenseGUI and elsewhere) =======
+    public String getTanggal() {
+        return tanggal;
+    }
+
+    public String getKategori() {
+        return kategori;
+    }
+
+    public String getDeskripsi() {
+        return deskripsi;
+    }
+
+    public double getJumlah() {
+        return jumlah;
+    }
+    // ======= End getters =======
 }
