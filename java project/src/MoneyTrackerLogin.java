@@ -118,13 +118,12 @@ public class MoneyTrackerLogin extends JFrame {
             return;
         }
 
-        // ✅ PERUBAHAN: UserInformation → UserManager
+    
         if (!UserManager.accountExists(email)) {
             showMessage("Account not found!", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // ✅ PERUBAHAN: UserInformation → UserManager
         if (!UserManager.validateLogin(email, password)) {
             showMessage("Incorrect password!", JOptionPane.ERROR_MESSAGE);
             loginPassword.setText("");
@@ -132,7 +131,6 @@ public class MoneyTrackerLogin extends JFrame {
         }
 
         // Login berhasil
-        // ✅ PERUBAHAN: UserInformation → UserManager
         String fullName = UserManager.getFullName(email);
         openDashboard(fullName);
     }
@@ -152,13 +150,11 @@ public class MoneyTrackerLogin extends JFrame {
             return;
         }
 
-        // ✅ PERUBAHAN: UserInformation → UserManager
         if (UserManager.accountExists(email)) {
             showMessage("Email already registered!", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // ✅ PERUBAHAN: UserInformation → UserManager
         UserManager.createAccount(email, password, fullName);
         showMessage("Account created successfully!", JOptionPane.INFORMATION_MESSAGE);
 
@@ -175,7 +171,6 @@ public class MoneyTrackerLogin extends JFrame {
         if (email == null || email.trim().isEmpty())
             return;
 
-        // ✅ PERUBAHAN: UserInformation → UserManager
         if (!UserManager.accountExists(email.trim())) {
             showMessage("Email not found!", JOptionPane.ERROR_MESSAGE);
             return;
@@ -197,14 +192,13 @@ public class MoneyTrackerLogin extends JFrame {
                 return;
             }
 
-            // ✅ PERUBAHAN: UserInformation → UserManager
+            
             UserManager.updatePassword(email.trim(), newPassword);
             showMessage("Password reset successful!", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
     private void openDashboard(String fullName) {
-        // ✅ PERUBAHAN: UserInformation → UserManager
         UserManager.login(fullName);
 
         // Load data untuk user ini
@@ -219,7 +213,7 @@ public class MoneyTrackerLogin extends JFrame {
         // Tutup login window
         dispose();
 
-        // Buka dashboard window
+        // Buka dashboard utama
         SwingUtilities.invokeLater(() -> {
             JFrame dashboardFrame = new JFrame("Money Tracker - Dashboard");
             DashboardGUI dashboard = new DashboardGUI(fullName);
@@ -282,7 +276,7 @@ public class MoneyTrackerLogin extends JFrame {
 
     private JLabel addLabel(JPanel panel, String text, int size, int style, int x, int y) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("Arial", style, size));
+        label.setFont(new Font("SansSerif", style, size));
         label.setForeground(Color.WHITE);
         label.setBounds(x, y, 220, style == Font.BOLD ? 35 : 20);
         panel.add(label);
@@ -296,7 +290,7 @@ public class MoneyTrackerLogin extends JFrame {
         field.setForeground(Color.WHITE);
         field.setCaretColor(Color.WHITE);
         field.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.WHITE));
-        field.setFont(new Font("Arial", Font.PLAIN, 14));
+        field.setFont(new Font("SansSerif", Font.PLAIN, 14));
         panel.add(field);
         return field;
     }
@@ -308,7 +302,7 @@ public class MoneyTrackerLogin extends JFrame {
         field.setForeground(Color.WHITE);
         field.setCaretColor(Color.WHITE);
         field.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.WHITE));
-        field.setFont(new Font("Arial", Font.PLAIN, 14));
+        field.setFont(new Font("SansSerif", Font.PLAIN, 14));
         panel.add(field);
         return field;
     }
@@ -328,7 +322,7 @@ public class MoneyTrackerLogin extends JFrame {
         btn.setBounds(x, y, 160, 45);
         btn.setBackground(bg);
         btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Arial", Font.BOLD, 14));
+        btn.setFont(new Font("SansSerif", Font.BOLD, 14));
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
