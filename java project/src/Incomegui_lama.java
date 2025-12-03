@@ -39,13 +39,12 @@ public class Incomegui_lama extends JFrame {
 
         try {
             manager.loadData(currentUsername);
-            System.out.println("Data Income untuk " + currentUsername + " berhasil dimuat.");
+            System.out.println("Income data for " + currentUsername + " loaded successfully.");
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("File data Income belum ada, memulai dengan data kosong.");
+            System.out.println("Income data file not found, starting with empty data.");
         }
 
         buatTampilan();
-
 
         setTitle("INCOME");
         setSize(500, 700);
@@ -114,12 +113,12 @@ public class Incomegui_lama extends JFrame {
         gbc.weightx = 0.8;
         gbc.gridx = 1;
 
-        // Header
+        // Header 
         gbc.gridy = 0;
         JLabel lblHeader = new JLabel("INCOME");
         lblHeader.setFont(new Font("SansSerif", Font.BOLD, 18));
         lblHeader.setForeground(Color.WHITE);
-        lblHeader.setBackground(darkGray);
+        lblHeader.setBackground(new Color(76, 175, 80));
         lblHeader.setOpaque(true);
         lblHeader.setHorizontalAlignment(SwingConstants.CENTER);
         lblHeader.setPreferredSize(new Dimension(400, 45));
@@ -139,16 +138,16 @@ public class Incomegui_lama extends JFrame {
 
         // untuk kategori lain
         gbc.gridy = 3;
-        txtKategoriLain = createRoundedTextField("Ketik kategori lain...");
+        txtKategoriLain = createRoundedTextField("Type another category...");
         txtKategoriLain.setVisible(false);
         mainPanel.add(txtKategoriLain, gbc);
 
         gbc.gridy = 4;
-        txtDeskripsi = createRoundedTextField("DESKRIPSI (Optional)");
+        txtDeskripsi = createRoundedTextField("DESCRIPTION (Optional)");
         mainPanel.add(txtDeskripsi, gbc);
 
         gbc.gridy = 5;
-        txtJumlah = createRoundedTextField("JUMLAH (Angka tanpa koma)");
+        txtJumlah = createRoundedTextField("AMOUNT (Number without comma)");
         mainPanel.add(txtJumlah, gbc);
 
         add(mainPanel, BorderLayout.NORTH);
@@ -185,7 +184,7 @@ public class Incomegui_lama extends JFrame {
         btnHapus.setBorderPainted(false);
         btnHapus.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // ✅ TOMBOL BACK
+        // tombol back
         btnBack = new JButton("Back");
         btnBack.setFont(new Font("SansSerif", Font.BOLD, 13));
         btnBack.setForeground(Color.WHITE);
@@ -199,7 +198,7 @@ public class Incomegui_lama extends JFrame {
         btnPanel.add(btnHapus);
         btnPanel.add(btnBack);
 
-        String[] namaKolom = { "No", "Tanggal", "Kategori", "Deskripsi", "Jumlah" };
+        String[] namaKolom = { "No", "Date", "Category", "Description", "Amount" };
         modelTabel = new DefaultTableModel(namaKolom, 0) {
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -254,7 +253,7 @@ public class Incomegui_lama extends JFrame {
         JPanel totalPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         totalPanel.setOpaque(false);
 
-        JLabel lblTotalText = new JLabel("Total Pemasukan: ");
+        JLabel lblTotalText = new JLabel("Total Income: ");
         lblTotalText.setFont(new Font("SansSerif", Font.BOLD, 16));
 
         labelTotal = new JLabel("Rp 0");
@@ -270,7 +269,7 @@ public class Incomegui_lama extends JFrame {
 
         add(bottomPanel, BorderLayout.CENTER);
 
-        // Action Listeners
+        // action Listeners
         btnTambah.addActionListener(e -> tambahData());
         btnHapus.addActionListener(e -> hapusData());
         btnClear.addActionListener(e -> clearForm());
@@ -295,12 +294,12 @@ public class Incomegui_lama extends JFrame {
     // untuk kategori
     private JComboBox<String> createKategoriComboBox() {
         String[] kategori = {
-            "Gaji",
-            "Uang Saku",
-            "Investasi",
-            "Hadiah",
+            "Salary",
+            "Pocket Money",
+            "Investment",
+            "Gift",
             "Freelance",
-            "Lain-lain"
+            "Others"
         };
         
         JComboBox<String> combo = new JComboBox<>(kategori);
@@ -309,11 +308,11 @@ public class Incomegui_lama extends JFrame {
         combo.setBackground(lightGray);
         
         combo.addActionListener(e -> {
-            if (combo.getSelectedItem().equals("Lain-lain")) {
+            if (combo.getSelectedItem().equals("Others")) {
                 txtKategoriLain.setVisible(true);
             } else {
                 txtKategoriLain.setVisible(false);
-                txtKategoriLain.setText("Type another category");
+                txtKategoriLain.setText("Type another category...");
                 txtKategoriLain.setForeground(Color.GRAY);
             }
 
@@ -337,7 +336,7 @@ public class Incomegui_lama extends JFrame {
             }
         };
 
-        txt.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        txt.setFont(new Font("SansSerif", Font.PLAIN, 12));
         txt.setPreferredSize(new Dimension(400, 45));
         txt.setBackground(lightGray);
         txt.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -395,24 +394,24 @@ public class Incomegui_lama extends JFrame {
         
         // kategori
         String kategori = (String) cmbKategori.getSelectedItem();
-        if (kategori.equals("Lain-lain")) {
+        if (kategori.equals("Others")) {
             kategori = txtKategoriLain.getText().trim();
-            if (kategori.isEmpty() || kategori.equals("Ketik kategori lain...")) {
+            if (kategori.isEmpty() || kategori.equals("Type another category...")) {
                 JOptionPane.showMessageDialog(this,
-                    "Kategori 'Lain-lain' harus diisi!",
+                    "'Others' category must be filled!",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
                 return;
             }
         }
         
-        String deskripsi = txtDeskripsi.getText().trim().equals("DESKRIPSI (Optional)") ? "-"
+        String deskripsi = txtDeskripsi.getText().trim().equals("DESCRIPTION (Optional)") ? "-"
                 : txtDeskripsi.getText().trim();
         String jumlahText = txtJumlah.getText().trim();
 
-        if (jumlahText.equals("JUMLAH (Angka tanpa koma)")) {
+        if (jumlahText.equals("AMOUNT (Number without comma)")) {
             JOptionPane.showMessageDialog(this,
-                    "Field Jumlah wajib diisi!",
+                    "Amount field is required!",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
@@ -432,8 +431,8 @@ public class Incomegui_lama extends JFrame {
         clearForm();
 
         JOptionPane.showMessageDialog(this,
-                "Data berhasil ditambahkan!",
-                "Sukses",
+                "Data added successfully!",
+                "Success",
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -442,15 +441,15 @@ public class Incomegui_lama extends JFrame {
 
         if (barisTerpilih == -1) {
             JOptionPane.showMessageDialog(this,
-                    "Pilih data yang ingin dihapus!",
-                    "Peringatan",
+                    "Please select the data you want to delete!",
+                    "Warning",
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         int konfirmasi = JOptionPane.showConfirmDialog(this,
-                "Apakah Anda yakin ingin menghapus data ini?",
-                "Konfirmasi",
+                "Are you sure you want to delete this data?",
+                "Confirmation",
                 JOptionPane.YES_NO_OPTION);
 
         if (konfirmasi == JOptionPane.YES_OPTION) {
@@ -458,12 +457,12 @@ public class Incomegui_lama extends JFrame {
             if (success) {
                 updateTabel();
                 JOptionPane.showMessageDialog(this,
-                        "Data berhasil dihapus!",
-                        "Sukses",
+                        "Data deleted successfully!",
+                        "Success",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this,
-                        "Gagal menghapus data!",
+                        "Failed to delete data!",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
@@ -474,9 +473,9 @@ public class Incomegui_lama extends JFrame {
         dateSpinner.setValue(new Date());
         cmbKategori.setSelectedIndex(0);
         txtKategoriLain.setVisible(false);
-        txtDeskripsi.setText("DESKRIPSI (Opsional)");
+        txtDeskripsi.setText("DESCRIPTION (Optional)");
         txtDeskripsi.setForeground(Color.GRAY);
-        txtJumlah.setText("JUMLAH (Angka tanpa koma)");
+        txtJumlah.setText("AMOUNT (Number without comma)");
         txtJumlah.setForeground(Color.GRAY);
     }
 
@@ -510,10 +509,10 @@ public class Incomegui_lama extends JFrame {
     private void handleBack() {
         try {
             manager.saveData(currentUsername);
-            System.out.println("Data Income berhasil disimpan untuk " + currentUsername);
+            System.out.println("Income data saved successfully for " + currentUsername);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this,
-                    "Gagal menyimpan data!", "Error Simpan", JOptionPane.ERROR_MESSAGE);
+                    "Failed to save data!", "Save Error", JOptionPane.ERROR_MESSAGE);
         }
         
         if (onCloseCallback != null) {

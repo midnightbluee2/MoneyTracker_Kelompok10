@@ -2,7 +2,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-//
+
 public class MainMoneyTracker extends JFrame {
 
     public MainMoneyTracker(String username) {

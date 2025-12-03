@@ -16,11 +16,11 @@ public class PieChartPanel extends JPanel {
         setOpaque(false);
     }
 
-    // Update data chart dari list Expense
+    // update data chart dari list Expense
     public void updateDataFromExpenses(List<Expense> expenses) {
         dataKategori.clear();
         
-        // Hitung total per kategori
+        // hitung jumlah total per kategori
         for (Expense exp : expenses) {
             String kategori = exp.getKategori();
             double jumlah = exp.getJumlah();
@@ -32,7 +32,7 @@ public class PieChartPanel extends JPanel {
         repaint();
     }
 
-    // Assign warna otomatis untuk setiap kategori
+    // warna untuk kategori di pie chart
     private void assignColors() {
         Color[] paletWarna = {
             new Color(244, 67, 54),   // Merah
@@ -62,7 +62,7 @@ public class PieChartPanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Jika tidak ada data
+        // jika tidak ada data
         if (dataKategori == null || dataKategori.isEmpty()) {
             g2d.setFont(new Font("SansSerif", Font.PLAIN, 12));
             g2d.setColor(Color.GRAY);
@@ -74,7 +74,7 @@ public class PieChartPanel extends JPanel {
             return;
         }
 
-        // Hitung total
+        // hitung total
         double total = 0;
         for (double nilai : dataKategori.values()) {
             total += nilai;
@@ -91,7 +91,7 @@ public class PieChartPanel extends JPanel {
             return;
         }
 
-        // Gambar pie chart
+        // gambar pie chart
         int diameter = Math.min(getWidth() - 150, getHeight() - 40);
         int x = 20;
         int y = (getHeight() - diameter) / 2;
@@ -108,7 +108,7 @@ public class PieChartPanel extends JPanel {
             startAngle += angle;
         }
 
-        // Gambar legend
+        // gambar keterangan kategori
         drawLegend(g2d, diameter + 40, 20);
     }
 
@@ -120,11 +120,11 @@ public class PieChartPanel extends JPanel {
             String kategori = entry.getKey();
             double nilai = entry.getValue();
 
-            // Kotak warna
+            // kotak warna
             g2d.setColor(warnaKategori.get(kategori));
             g2d.fillRect(x, offsetY, 10, 10);
 
-            // Text
+            // text
             g2d.setColor(Color.BLACK);
             String text = kategori + ": Rp " + String.format("%,.0f", nilai);
             g2d.drawString(text, x + 15, offsetY + 9);

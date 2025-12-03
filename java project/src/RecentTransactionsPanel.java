@@ -9,17 +9,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Panel untuk menampilkan transaksi terbaru (Income + Expense)
- * VERSI INTEGRASI: Mengambil data langsung dari class Income dan Expense.
- */
+// panel untuk recent transaction
 public class RecentTransactionsPanel extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
     private int maxTransactions;
 
-    // --- INNER CLASS TRANSACTION ---
-    // Class pembungkus sederhana untuk menyamakan format data Income & Expense
+    // menyamakan format data Income & Expense
     private static class Transaction {
         String tanggal;
         String tipe; // "Income" atau "Expense"
@@ -65,8 +61,7 @@ public class RecentTransactionsPanel extends JPanel {
         table.getTableHeader().setBackground(new Color(163, 181, 101));
         table.getTableHeader().setForeground(Color.WHITE);
 
-        // Custom Cell Renderer untuk warna teks (Hijau untuk Income, Merah untuk
-        // Expense)
+        // Custom Cell Renderer untuk warna teks sesuai tipe (income atau expense)
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -77,17 +72,17 @@ public class RecentTransactionsPanel extends JPanel {
                     c.setBackground(Color.WHITE);
                     c.setForeground(Color.BLACK);
 
-                    // Cek kolom "Type" (index 1)
+                    // warna teks sesuai tipe (Income atau Expense)
                     String tipe = (String) table.getValueAt(row, 1);
                     if ("Income".equals(tipe)) {
-                        c.setForeground(new Color(76, 175, 80)); // Hijau
+                        c.setForeground(new Color(76, 175, 80)); 
                     } else if ("Expense".equals(tipe)) {
-                        c.setForeground(new Color(244, 67, 54)); // Merah
+                        c.setForeground(new Color(244, 67, 54)); 
                     }
                 }
 
                 // Alignment text
-                if (column == 3) { // Kolom Amount rata kanan
+                if (column == 3) { 
                     ((JLabel) c).setHorizontalAlignment(SwingConstants.RIGHT);
                 } else {
                     ((JLabel) c).setHorizontalAlignment(SwingConstants.LEFT);
@@ -97,7 +92,7 @@ public class RecentTransactionsPanel extends JPanel {
             }
         });
 
-        // Atur lebar kolom
+        // atur lebar kolom
         table.getColumnModel().getColumn(0).setPreferredWidth(80); // Date
         table.getColumnModel().getColumn(1).setPreferredWidth(60); // Type
         table.getColumnModel().getColumn(2).setPreferredWidth(100); // Category
@@ -109,13 +104,11 @@ public class RecentTransactionsPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    /**
-     * Dipanggil untuk me-refresh isi tabel
-     */
+    // refresh isi tabel
     public void updateTransactions() {
-        tableModel.setRowCount(0); // Hapus data lama
+        tableModel.setRowCount(0); 
 
-        // Ambil data gabungan dari Income & Expense
+        // mengambil data gabungan dari Income & Expense
         List<Transaction> transactions = getCombinedTransactions(maxTransactions);
 
         if (transactions.isEmpty()) {
@@ -135,12 +128,12 @@ public class RecentTransactionsPanel extends JPanel {
         }
     }
 
-    // --- LOGIKA UTAMA: Mengambil dan Menggabungkan Data ---
+    // untuk menggambil dan menggabungkan data
     private List<Transaction> getCombinedTransactions(int limit) {
         List<Transaction> allTransactions = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-        // 1. Ambil data dari EXPENSE (Sesuai file Expense.java kamu)
+        // ambil data dari EXPENSE (Sesuai file Expense.java kamu)
         List<Expense> expenses = Expense.getDaftarExpense();
         if (expenses != null) {
             for (Expense exp : expenses) {
@@ -152,9 +145,8 @@ public class RecentTransactionsPanel extends JPanel {
             }
         }
 
-        // 2. Ambil data dari INCOME (Sesuai file Income.java kamu)
-        // Langsung akses static list dari class Income
-        IncomeManager manager = IncomeManager.getInstance();
+        // ambil data dari INCOME (Sesuai file Income.java kamu)
+        IncomeManager manager = IncomeManager.getInstance(); //  akses static list dari class Income
         if (manager != null) {
             ArrayList<Income> incomes = manager.ambilsemuaincome();
             if (incomes != null) {
@@ -169,21 +161,21 @@ public class RecentTransactionsPanel extends JPanel {
             }
         }
 
-        // 3. Sorting data berdasarkan Tanggal (Terbaru -> Terlama)
+        // sorting data berdasarkan Tanggal (terbaru ke terlama)
         Collections.sort(allTransactions, new Comparator<Transaction>() {
             @Override
             public int compare(Transaction t1, Transaction t2) {
                 try {
                     LocalDate d1 = LocalDate.parse(t1.tanggal, formatter);
                     LocalDate d2 = LocalDate.parse(t2.tanggal, formatter);
-                    return d2.compareTo(d1); // Descending (t2 banding t1)
+                    return d2.compareTo(d1); // urutan descending (t2 banding t1)
                 } catch (Exception e) {
-                    return 0; // Abaikan jika format tanggal error
+                    return 0; // diabaikan jika format tanggal error
                 }
             }
         });
 
-        // 4. Batasi jumlah data (Limit) sesuai parameter
+        // membatasi jumlah data (Limit) sesuai parameter
         if (allTransactions.size() > limit) {
             return allTransactions.subList(0, limit);
         }

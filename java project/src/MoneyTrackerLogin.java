@@ -26,11 +26,12 @@ public class MoneyTrackerLogin extends JFrame {
         setVisible(true);
     }
 
+    // panel log in
     private JPanel createLoginPanel() {
         Color colorTop = new Color(184, 142, 167);
         Color colorBottom = new Color(227, 216, 206);
 
-        JPanel panel = createGradientPanel(colorTop, colorBottom);
+        GradientColor panel = new GradientColor(colorTop, colorBottom);
         panel.setLayout(null);
 
         JPanel card = createCard(100, 80, new Color(69, 83, 120, 230));
@@ -44,7 +45,7 @@ public class MoneyTrackerLogin extends JFrame {
         addLabel(card, "Password", 14, Font.PLAIN, 40, 185);
         loginPassword = addPasswordField(card, 40, 210, new Color(69, 83, 120, 230));
 
-        JLabel forgot = addLabel(card, "forgot password?", 12, Font.PLAIN, 40, 250);
+        JLabel forgot = addLabel(card, "Forgot Password?", 12, Font.PLAIN, 40, 250);
         forgot.setCursor(new Cursor(Cursor.HAND_CURSOR));
         forgot.setHorizontalAlignment(SwingConstants.CENTER);
         forgot.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -71,11 +72,12 @@ public class MoneyTrackerLogin extends JFrame {
         return panel;
     }
 
+    // panel sign up
     private JPanel createSignupPanel() {
         Color colorTop = new Color(227, 216, 206);
         Color colorBottom = new Color(184, 142, 167);
 
-        JPanel panel = createGradientPanel(colorTop, colorBottom);
+        GradientColor panel = new GradientColor(colorTop, colorBottom);
         panel.setLayout(null);
 
         JPanel card = createCard(100, 80, new Color(47, 79, 79, 230));
@@ -109,6 +111,7 @@ public class MoneyTrackerLogin extends JFrame {
         return panel;
     }
 
+    // manajemen bagian log in
     private void handleLogin() {
         String email = loginEmail.getText().trim();
         String password = new String(loginPassword.getPassword());
@@ -130,11 +133,12 @@ public class MoneyTrackerLogin extends JFrame {
             return;
         }
 
-        // Login berhasil
+        // login berhasil
         String fullName = UserManager.getFullName(email);
         openDashboard(fullName);
     }
 
+    // manajemen bagian create account (membuat akun)
     private void handleCreateAccount() {
         String email = signupEmail.getText().trim();
         String fullName = signupName.getText().trim();
@@ -164,6 +168,7 @@ public class MoneyTrackerLogin extends JFrame {
         cardLayout.show(mainPanel, "login");
     }
 
+    // manajemen bagian lupa password
     private void handleForgotPassword() {
         String email = JOptionPane.showInputDialog(this, "Enter your email:",
                 "Forgot Password", JOptionPane.QUESTION_MESSAGE);
@@ -201,7 +206,7 @@ public class MoneyTrackerLogin extends JFrame {
     private void openDashboard(String fullName) {
         UserManager.login(fullName);
 
-        // Load data untuk user ini
+        // Load data untuk user 
         try {
             Expense.loadFromFile(fullName);
             IncomeManager.loadFromFile(fullName);
@@ -210,10 +215,10 @@ public class MoneyTrackerLogin extends JFrame {
             System.out.println("Starting with empty data for: " + fullName);
         }
 
-        // Tutup login window
+        // tutup login window
         dispose();
 
-        // Buka dashboard utama
+        // buka dashboard utama
         SwingUtilities.invokeLater(() -> {
             JFrame dashboardFrame = new JFrame("Money Tracker - Dashboard");
             DashboardGUI dashboard = new DashboardGUI(fullName);
@@ -224,7 +229,7 @@ public class MoneyTrackerLogin extends JFrame {
             dashboardFrame.setLocationRelativeTo(null);
             dashboardFrame.setResizable(false);
 
-            // Auto-save data saat tutup aplikasi
+            // auto-save data saat tutup aplikasi
             dashboardFrame.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
                 public void windowClosing(java.awt.event.WindowEvent e) {
@@ -242,20 +247,6 @@ public class MoneyTrackerLogin extends JFrame {
         });
     }
 
-    private JPanel createGradientPanel(Color colorTop, Color colorBottom) {
-        return new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                GradientPaint gradient = new GradientPaint(0, 0, colorTop, getWidth(), getHeight(), colorBottom);
-                g2d.setPaint(gradient);
-                g2d.fillRect(0, 0, getWidth(), getHeight());
-            }
-        };
-    }
 
     private JPanel createCard(int x, int y, Color bgColor) {
         JPanel card = new JPanel() {

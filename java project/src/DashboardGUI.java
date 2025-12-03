@@ -20,11 +20,11 @@ public class DashboardGUI extends GradientColor {
     private JLabel expenseLabel;
     private String currentUsername;
     
-    // ✅ TAMBAHAN: Components untuk Chart dan Recent Transactions
+    // untuk pie chart dan recent transactions
     private PieChartPanel pieChart;
     private RecentTransactionsPanel recentTransPanel;
 
-    // Untuk nanti dipanggil pada summary uang (income, balance, expense)
+    // dipanggil pada summary uang (income, balance, expense)
     private JPanel moneySummary(String title, String amount, Color colorTop, Color colorBottom) {
         GradientColor summary = new GradientColor(colorTop, colorBottom);
 
@@ -43,7 +43,7 @@ public class DashboardGUI extends GradientColor {
         summary.add(Box.createVerticalStrut(1));
         summary.add(forAmount);
 
-        // Simpan reference untuk update nanti
+        // reference untuk update 
         if (title.equals("Balance")) {
             balanceLabel = forAmount;
         } else if (title.equals("Income")) {
@@ -55,7 +55,7 @@ public class DashboardGUI extends GradientColor {
         return summary;
     }
 
-    // Membuat button untuk input transaksi
+    // button untuk input transaksi
     private JButton forButton(String transaction, Color color) {
         JButton button = new JButton(transaction);
         button.setBackground(color);
@@ -68,7 +68,7 @@ public class DashboardGUI extends GradientColor {
         return button;
     }
 
-    // ✅ UPDATED: Method untuk update summary DAN chart + tabel
+    // method update summary dan pie chart
     public void updateSummary() {
         String forBalance = BalanceManager.getBalanceFormatted();
         String forIncome = "Rp " + String.format("%,.0f", IncomeManager.getTotalIncome());
@@ -78,25 +78,25 @@ public class DashboardGUI extends GradientColor {
         if (incomeLabel != null) incomeLabel.setText(forIncome);
         if (expenseLabel != null) expenseLabel.setText(forExpense);
         
-        // ✅ Update Pie Chart
+        // update pie chart
         if (pieChart != null) {
             pieChart.updateDataFromExpenses(Expense.getDaftarExpense());
         }
         
-        // ✅ Update Recent Transactions
+        // update recent transaction
         if (recentTransPanel != null) {
             recentTransPanel.updateTransactions();
         }
     }
 
-    // Dashboard Constructor - Menerima username
+    // dashboard Constructor - Menerima username
     public DashboardGUI(String username) {
         super(new Color(184, 142, 167), new Color(227, 216, 206));
         this.currentUsername = username;
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // Load data untuk user ini
+        // load data untuk user ini
         try {
             Expense.loadFromFile(currentUsername);
             IncomeManager.loadFromFile(currentUsername);
@@ -117,7 +117,7 @@ public class DashboardGUI extends GradientColor {
         titleLabel.setForeground(Color.WHITE);
 
         JLabel userGreet = new JLabel("Hi, " + currentUsername + "!");
-        userGreet.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        userGreet.setFont(new Font("SansSerif", Font.BOLD, 14));
 
         headerPanel.add(titleLabel);
         headerPanel.add(Box.createVerticalStrut(-5));
@@ -126,20 +126,20 @@ public class DashboardGUI extends GradientColor {
         this.add(headerPanel);
         this.add(Box.createVerticalStrut(10));
 
-        // ✅ UPDATED: Pie Chart (Ganti dari placeholder ke actual chart)
+        // panel pie chart
         GradientColor chartPanel = new GradientColor(new Color(222, 209, 198), new Color(242, 243, 244));
         chartPanel.setLayout(new BoxLayout(chartPanel, BoxLayout.Y_AXIS));
         chartPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 220));
         chartPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 220));
         chartPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel titleChart = new JLabel("Expenses by Category");
+        JLabel titleChart = new JLabel("EXPENSES");
         titleChart.setFont(new Font("SansSerif", Font.BOLD, 14));
         titleChart.setAlignmentX(Component.CENTER_ALIGNMENT);
         titleChart.setBorder(new EmptyBorder(5, 0, 0, 0));
 
-        // ✅ Buat Pie Chart
-        pieChart = new PieChartPanel("Expense Categories");
+        // menampilkan panel pie chart
+        pieChart = new PieChartPanel("Expense Categories"); // panggil class
         pieChart.setAlignmentX(Component.CENTER_ALIGNMENT);
         pieChart.updateDataFromExpenses(Expense.getDaftarExpense());
 
@@ -149,7 +149,7 @@ public class DashboardGUI extends GradientColor {
         this.add(chartPanel);
         this.add(Box.createVerticalStrut(10));
 
-        // Total (Income, Expense, Balance)
+        // summary (Income, Expense, Balance)
         sumPanel = new JPanel();
         sumPanel.setLayout(new GridLayout(1, 3, 10, 0));
         sumPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
@@ -158,7 +158,7 @@ public class DashboardGUI extends GradientColor {
         sumPanel.setBackground(new Color(0, 0, 0));
         sumPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Ambil data Balance, Income, Expense
+        // ambil data Balance, Income, Expense
         String forBalance = BalanceManager.getBalanceFormatted();
         String forIncome = "Rp " + String.format("%,.0f", IncomeManager.getTotalIncome());
         String forExpense = "Rp " + String.format("%,.0f", Expense.getTotalExpense());
@@ -173,7 +173,7 @@ public class DashboardGUI extends GradientColor {
         this.add(sumPanel);
         this.add(Box.createVerticalStrut(10));
 
-        // ✅ UPDATED: Recent Transactions (Ganti dari placeholder)
+        // panel belakang recent transactions
         JPanel transPanel = new JPanel();
         transPanel.setLayout(new BorderLayout());
         transPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 220));
@@ -182,8 +182,8 @@ public class DashboardGUI extends GradientColor {
         transPanel.setOpaque(true);
         transPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // ✅ Buat Recent Transactions Panel
-        recentTransPanel = new RecentTransactionsPanel(5); // Tampilkan 5 transaksi terakhir
+        // tempat tabel recent transactions
+        recentTransPanel = new RecentTransactionsPanel(5); 
         recentTransPanel.setBackground(new Color(179, 199, 116));
         recentTransPanel.updateTransactions();
         
@@ -192,7 +192,7 @@ public class DashboardGUI extends GradientColor {
         this.add(transPanel);
         this.add(Box.createVerticalStrut(10));
 
-        // Button pindah page
+        // button pindah page
         JPanel transButton = new JPanel();
         transButton.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));
         transButton.setOpaque(false);

@@ -1,8 +1,5 @@
 import java.util.ArrayList;
 import java.io.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public class IncomeManager {
     private ArrayList<Income> daftarincomee = new ArrayList<>();
@@ -36,43 +33,31 @@ public class IncomeManager {
         return total;
     }
 
-    // Method untuk validasi dan penambahan income
+    // method untuk validasi dan penambahan income
     public String tambahIncome(String tanggal, String kategori, String deskripsi, String jumlahStr) {
         try {
-            // Validasi tanggal
-            if (tanggal == null || tanggal.isEmpty() || tanggal.equals("TANGGAL")) {
-                return "Tanggal tidak boleh kosong!";
-            }
-            
-            try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                LocalDate.parse(tanggal, formatter);
-            } catch (DateTimeParseException e) {
-                return "Format tanggal salah! Gunakan format dd-MM-yyyy";
-            }
-            
-            // Validasi kategori
+            // validasi kategori
             if (kategori == null || kategori.isEmpty() || kategori.equals("KATEGORI")) {
-                return "Kategori tidak boleh kosong!";
+                return "Category cannot be empty!";
             }
             
-            // Validasi deskripsi
+            // validasi deskripsi
             if (deskripsi == null || deskripsi.isEmpty() || deskripsi.equals("DESKRIPSI")) {
                 deskripsi = "-";
             }
             
-            // Validasi jumlah
+            // validasi jumlah
             double jumlah;
             try {
                 jumlah = Double.parseDouble(jumlahStr);
                 if (jumlah <= 0) {
-                    return "Jumlah harus lebih besar dari 0!";
+                    return "Amount must be greater than 0!";
                 }
             } catch (NumberFormatException e) {
-                return "Jumlah harus berupa angka!";
+                return "Amount must be a number!";
             }
             
-            // Tambahkan income
+            // tambahkan income
             Income income = new Income(tanggal, kategori, deskripsi, jumlah);
             addIncome(income);
             return "SUCCESS";
@@ -82,7 +67,7 @@ public class IncomeManager {
         }
     }
 
-    // Save/Load methods
+    // save/load methods
     public void saveData(String username) throws IOException {
         File folder = new File("data");
         if (!folder.exists())
@@ -114,7 +99,7 @@ public class IncomeManager {
         instance = manager;
     }
 
-    // Get instance yang sedang digunakan
+    // sedang digunakan
     public static IncomeManager getInstance() {
         if (instance == null) {
             instance = new IncomeManager();
@@ -122,7 +107,7 @@ public class IncomeManager {
         return instance;
     }
 
-    // Static method untuk get total income
+    // untuk get total income
     public static double getTotalIncome() {
         if (instance == null) {
             return 0.0;
@@ -130,7 +115,7 @@ public class IncomeManager {
         return instance.totalIncome();
     }
 
-    // Static method untuk load dari file
+    // untuk load dari file
     public static void loadFromFile(String username) throws IOException, ClassNotFoundException {
         if (instance == null) {
             instance = new IncomeManager();
@@ -138,7 +123,7 @@ public class IncomeManager {
         instance.loadData(username);
     }
 
-    // Static method untuk save ke file
+    // untuk save ke file
     public static void saveToFile(String username) throws IOException {
         if (instance != null) {
             instance.saveData(username);
