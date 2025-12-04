@@ -61,7 +61,7 @@ public class RecentTransactionsPanel extends JPanel {
         table.getTableHeader().setBackground(new Color(163, 181, 101));
         table.getTableHeader().setForeground(Color.WHITE);
 
-        // Custom Cell Renderer untuk warna teks sesuai tipe (income atau expense)
+        // custom Cell Renderer untuk warna teks sesuai tipe (income atau expense)
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -98,10 +98,24 @@ public class RecentTransactionsPanel extends JPanel {
         table.getColumnModel().getColumn(2).setPreferredWidth(100); // Category
         table.getColumnModel().getColumn(3).setPreferredWidth(100); // Amount
 
-        JScrollPane scrollPane = new JScrollPane(table);
+        JScrollPane scrollPane = new JScrollPane(table){
+            @Override
+            protected void paintComponent(Graphics g){
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+
+        };
+
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(5, 15, 15, 15));
         add(scrollPane, BorderLayout.CENTER);
+        
     }
 
     // refresh isi tabel

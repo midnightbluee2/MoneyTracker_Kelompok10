@@ -4,7 +4,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.RenderingHints;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -60,9 +64,9 @@ public class DashboardGUI extends GradientColor {
         JButton button = new JButton(transaction);
         button.setBackground(color);
         button.setForeground(Color.WHITE);
-        button.setFont(new Font("SansSerif", Font.BOLD, 16));
-        button.setPreferredSize(new Dimension(180, 50));
-        button.setMaximumSize(new Dimension(180, 50));
+        button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        button.setPreferredSize(new Dimension(140, 50));
+        button.setMaximumSize(new Dimension(100, 50));
         button.setFocusPainted(false);
 
         return button;
@@ -87,8 +91,27 @@ public class DashboardGUI extends GradientColor {
         if (recentTransPanel != null) {
             recentTransPanel.updateTransactions();
         }
+        
     }
 
+    // Membuat bentuk rounded di panel
+    private JPanel forRoundedPanelGradient(Color colorTop, Color colorBottom){
+        JPanel roundPanel = new JPanel(){
+        @Override
+        protected void paintComponent(Graphics g){
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            java.awt.GradientPaint gradient = new java.awt.GradientPaint(0, 0, colorTop, getWidth(), getHeight(), colorBottom);
+            g2.setPaint(gradient);
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+            g2.dispose();
+            }
+        };
+        roundPanel.setOpaque(false);
+        return roundPanel;
+    }
+    
     // dashboard Constructor - Menerima username
     public DashboardGUI(String username) {
         super(new Color(184, 142, 167), new Color(227, 216, 206));
@@ -127,7 +150,7 @@ public class DashboardGUI extends GradientColor {
         this.add(Box.createVerticalStrut(10));
 
         // panel pie chart
-        GradientColor chartPanel = new GradientColor(new Color(222, 209, 198), new Color(242, 243, 244));
+        JPanel chartPanel = forRoundedPanelGradient(new Color(222, 209, 198), new Color(242, 243, 244));
         chartPanel.setLayout(new BoxLayout(chartPanel, BoxLayout.Y_AXIS));
         chartPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 220));
         chartPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 220));
@@ -174,16 +197,15 @@ public class DashboardGUI extends GradientColor {
         this.add(Box.createVerticalStrut(10));
 
         // panel belakang recent transactions
-        JPanel transPanel = new JPanel();
+        JPanel transPanel = forRoundedPanelGradient(new Color(179, 199, 116), new Color(179, 199, 116));
         transPanel.setLayout(new BorderLayout());
         transPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 220));
         transPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 220));
-        transPanel.setBackground(new Color(179, 199, 116));
-        transPanel.setOpaque(true);
         transPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
 
         // tempat tabel recent transactions
-        recentTransPanel = new RecentTransactionsPanel(5); 
+        recentTransPanel = new RecentTransactionsPanel(10); 
         recentTransPanel.setBackground(new Color(179, 199, 116));
         recentTransPanel.updateTransactions();
         
@@ -193,10 +215,24 @@ public class DashboardGUI extends GradientColor {
         this.add(Box.createVerticalStrut(10));
 
         // button pindah page
+        JPanel wrapperButton = forRoundedPanelGradient(new Color(140, 119, 163), new Color(207, 160, 179));
+        wrapperButton.setLayout(new BoxLayout(wrapperButton, BoxLayout.Y_AXIS));
+        wrapperButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+        wrapperButton.setPreferredSize(new Dimension(Integer.MAX_VALUE, 100));
+        wrapperButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        wrapperButton.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JLabel addTittle = new JLabel("Quick Add");
+        addTittle.setFont(new Font("SansSerif", Font.BOLD, 16));
+        addTittle.setForeground(Color.WHITE);
+        addTittle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        addTittle.setBorder(new EmptyBorder(0,10,0,0));
+
         JPanel transButton = new JPanel();
         transButton.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));
         transButton.setOpaque(false);
         transButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        transButton.setMaximumSize(new Dimension(Integer.MAX_VALUE,40));
 
         JButton incButton = forButton("Income", new Color(163, 181, 101));
         JButton expButton = forButton("Expenses", new Color(199, 39, 83));
@@ -207,10 +243,14 @@ public class DashboardGUI extends GradientColor {
         transButton.add(incButton);
         transButton.add(expButton);
 
-        this.add(transButton);
+        wrapperButton.add(addTittle);
+        wrapperButton.add(Box.createVerticalStrut(5));
+        wrapperButton.add(transButton);
+
+        this.add(wrapperButton);
         this.add(Box.createVerticalStrut(10));
 
-        // Button untuk logout
+        // button untuk logout
         JButton logoutBtn = new JButton("Logout");
         logoutBtn.setFont(new Font("SansSerif", Font.BOLD, 11));
         logoutBtn.setForeground(Color.WHITE);

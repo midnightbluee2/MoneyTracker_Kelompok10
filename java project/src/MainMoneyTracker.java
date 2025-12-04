@@ -45,7 +45,7 @@ public class MainMoneyTracker extends JFrame {
     public static void main(String[] args) {
         UserManager.loadUsers();
         SwingUtilities.invokeLater(() -> {
-            // Testing mode - langsung ke dashboard tanpa login
+            // testing - langsung ke dashboard tanpa login 
             String testUsername = JOptionPane.showInputDialog(
                 "Input Username (testing)");
             

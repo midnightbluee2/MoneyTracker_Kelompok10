@@ -47,11 +47,30 @@ public class PieChartPanel extends JPanel {
             new Color(255, 152, 0)    // Orange
         };
 
-        int index = 0;
+        warnaKategori.keySet().retainAll(dataKategori.keySet());
+
+        Set<Color> warnaTerpakai = new HashSet<>(warnaKategori.values());
+
+        int fallbackIndex = 0; // index cadangkan saat warna habis
         for (String kategori : dataKategori.keySet()) {
             if (!warnaKategori.containsKey(kategori)) {
-                warnaKategori.put(kategori, paletWarna[index % paletWarna.length]);
-                index++;
+                Color warnaPilihan = null;
+
+                for (Color c : paletWarna){
+                    if (!warnaTerpakai.contains(c)) {
+                        warnaPilihan = c;
+                        break; 
+                    }
+                }
+
+                if (warnaPilihan == null) {
+                    warnaPilihan = paletWarna[fallbackIndex % paletWarna.length];
+                    fallbackIndex++;
+                }
+
+                warnaKategori.put(kategori, warnaPilihan);
+                warnaTerpakai.add(warnaPilihan);
+                
             }
         }
     }
@@ -93,8 +112,14 @@ public class PieChartPanel extends JPanel {
 
         // gambar pie chart
         int diameter = Math.min(getWidth() - 150, getHeight() - 40);
-        int x = 20;
-        int y = (getHeight() - diameter) / 2;
+        int descWidth = 150;
+        int totalWidth = diameter + 20 + descWidth;
+
+
+        // posisi center
+        int startX = (getWidth() - totalWidth) / 2;
+        int pieX = startX;
+        int pieY = (getHeight() - diameter) / 2;
 
         int startAngle = 0;
         for (Map.Entry<String, Double> entry : dataKategori.entrySet()) {
@@ -103,16 +128,18 @@ public class PieChartPanel extends JPanel {
             int angle = (int) Math.round((nilai / total) * 360);
 
             g2d.setColor(warnaKategori.get(kategori));
-            g2d.fillArc(x, y, diameter, diameter, startAngle, angle);
+            g2d.fillArc(pieX, pieY, diameter, diameter, startAngle, angle);
 
             startAngle += angle;
         }
 
-        // gambar keterangan kategori
-        drawLegend(g2d, diameter + 40, 20);
+        // gambar keterangan kategori sebelah kanan pie
+        int descX = pieX + diameter + 20;
+        int desY = pieY + 10;
+        drawDesc(g2d, descX, desY);
     }
 
-    private void drawLegend(Graphics2D g2d, int x, int y) {
+    private void drawDesc(Graphics2D g2d, int x, int y) {
         g2d.setFont(new Font("SansSerif", Font.PLAIN, 10));
         int offsetY = y;
 
