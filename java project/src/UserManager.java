@@ -32,9 +32,9 @@ public class UserManager {
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             accounts = (Map<String, String[]>) ois.readObject();
-            System.out.println("✅ Loaded " + accounts.size() + " users from file.");
+            System.out.println("Loaded " + accounts.size() + " users from file.");
         } catch (Exception e) {
-            System.out.println("⚠️ Could not load users: " + e.getMessage());
+            System.out.println("Could not load users: " + e.getMessage());
             accounts = new HashMap<>();
         }
     }
@@ -48,9 +48,9 @@ public class UserManager {
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(USER_FILE))) {
             oos.writeObject(accounts);
-            System.out.println("💾 Users saved successfully.");
+            System.out.println("Users saved successfully.");
         } catch (IOException e) {
-            System.out.println("❌ Failed to save users: " + e.getMessage());
+            System.out.println("Failed to save users: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -67,7 +67,7 @@ public class UserManager {
     }
 
     public static void logout() {
-        System.out.println("👋 User logged out: " + currentUser);
+        System.out.println("User logged out: " + currentUser);
         currentUser = null;
     }
 
@@ -101,7 +101,7 @@ public class UserManager {
     public static void registerUser(String email, String password, String fullName) {
         accounts.put(email, new String[]{password, fullName});
         saveUsers(); // Langsung simpan permanen
-        System.out.println("✅ New user registered: " + email);
+        System.out.println("New user registered: " + email);
     }
 
     // Alias untuk konsistensi dengan UserInformation
@@ -122,7 +122,7 @@ public class UserManager {
         if (accounts.containsKey(email)) {
             accounts.get(email)[0] = newPassword;
             saveUsers();
-            System.out.println("🔑 Password updated for: " + email);
+            System.out.println(" Password updated for: " + email);
             return true;
         }
         return false;

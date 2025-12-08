@@ -42,6 +42,7 @@ public class Expense implements Serializable {
                 .mapToDouble(e -> e.jumlah)
                 .sum();
     }
+    
     public static void saveToFile(String username) throws IOException {
         File folder = new File("data");
         if (!folder.exists()) folder.mkdir();
@@ -75,7 +76,6 @@ public class Expense implements Serializable {
                 String.format("%,.0f", jumlah);
     }
 
-    // ======= Getter methods for Expense (used by ExpenseGUI and elsewhere) =======
     public String getTanggal() {
         return tanggal;
     }
@@ -91,5 +91,4 @@ public class Expense implements Serializable {
     public double getJumlah() {
         return jumlah;
     }
-    // ======= End getters =======
 }

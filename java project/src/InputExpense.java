@@ -15,7 +15,6 @@ public class InputExpense {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             LocalDate.parse(tanggal, formatter);
 
-            // menejer agar kategori tidak kosong
             if (kategori == null || kategori.trim().isEmpty()) {
                 throw new Exception("Category cannot be empty!");
             }

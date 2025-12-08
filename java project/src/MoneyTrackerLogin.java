@@ -1,6 +1,6 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import javax.swing.*;
 
 public class MoneyTrackerLogin extends JFrame {
     private CardLayout cardLayout;
@@ -43,7 +43,7 @@ public class MoneyTrackerLogin extends JFrame {
         loginEmail = addTextField(card, 40, 135, new Color(69, 83, 120, 230));
 
         addLabel(card, "Password", 14, Font.PLAIN, 40, 185);
-        loginPassword = addPasswordField(card, 40, 210, new Color(69, 83, 120, 230));
+        loginPassword = addPasswordField(card, 40, 210, new Color(69, 83, 120));
 
         JLabel forgot = addLabel(card, "Forgot Password?", 12, Font.PLAIN, 40, 250);
         forgot.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -124,12 +124,14 @@ public class MoneyTrackerLogin extends JFrame {
     
         if (!UserManager.accountExists(email)) {
             showMessage("Account not found!", JOptionPane.ERROR_MESSAGE);
+            loginEmail.requestFocusInWindow();
             return;
         }
 
         if (!UserManager.validateLogin(email, password)) {
             showMessage("Incorrect password!", JOptionPane.ERROR_MESSAGE);
             loginPassword.setText("");
+            loginPassword.requestFocusInWindow();
             return;
         }
 
@@ -151,11 +153,13 @@ public class MoneyTrackerLogin extends JFrame {
 
         if (!email.contains("@") || !email.contains(".")) {
             showMessage("Please enter a valid email!", JOptionPane.WARNING_MESSAGE);
+            signupEmail.requestFocusInWindow();
             return;
         }
 
         if (UserManager.accountExists(email)) {
             showMessage("Email already registered!", JOptionPane.WARNING_MESSAGE);
+            signupEmail.requestFocusInWindow();
             return;
         }
 
@@ -194,6 +198,7 @@ public class MoneyTrackerLogin extends JFrame {
 
             if (newPassword.isEmpty() || !newPassword.equals(confirm)) {
                 showMessage("Passwords don't match or empty!", JOptionPane.ERROR_MESSAGE);
+                handleForgotPassword(); // Retry
                 return;
             }
 
@@ -252,14 +257,21 @@ public class MoneyTrackerLogin extends JFrame {
         JPanel card = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
+                Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Clear area dulu
+                g2d.setColor(new Color(0, 0, 0, 0));
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+                
+                // Paint background solid
                 g2d.setColor(bgColor);
                 g2d.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 40, 40));
+                g2d.dispose();
             }
         };
-        card.setOpaque(false);
+        card.setOpaque(true); // Ubah jadi true
+        card.setBackground(bgColor); // Set background color
         card.setBounds(x, y, 300, 420);
         card.setLayout(null);
         return card;
@@ -275,25 +287,52 @@ public class MoneyTrackerLogin extends JFrame {
     }
 
     private JTextField addTextField(JPanel panel, int x, int y, Color bg) {
-        JTextField field = new JTextField();
+        JTextField field = new JTextField() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                // Paint solid background first
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setColor(getBackground());
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+                g2d.dispose();
+                
+                // Then paint text
+                super.paintComponent(g);
+            }
+        };
         field.setBounds(x, y, 220, 35);
         field.setBackground(bg);
         field.setForeground(Color.WHITE);
         field.setCaretColor(Color.WHITE);
         field.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.WHITE));
         field.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        field.setOpaque(true);
         panel.add(field);
         return field;
     }
 
     private JPasswordField addPasswordField(JPanel panel, int x, int y, Color bg) {
-        JPasswordField field = new JPasswordField();
+        JPasswordField field = new JPasswordField() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                // Paint solid background first
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setColor(getBackground());
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+                g2d.dispose();
+                
+                // Then paint password dots
+                super.paintComponent(g);
+            }
+        };
         field.setBounds(x, y, 220, 35);
         field.setBackground(bg);
         field.setForeground(Color.WHITE);
         field.setCaretColor(Color.WHITE);
         field.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.WHITE));
         field.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        field.setEchoChar('•');
+        field.setOpaque(true);
         panel.add(field);
         return field;
     }
