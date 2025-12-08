@@ -55,8 +55,6 @@ public class UserManager {
         }
     }
 
-    // ========== LOGIN & SESSION MANAGEMENT ==========
-
     public static void login(String username) {
         currentUser = username;
         System.out.println("👤 User logged in: " + username);
@@ -75,7 +73,7 @@ public class UserManager {
         return currentUser != null;
     }
 
-    // ========== ACCOUNT VALIDATION ==========
+
 
     // Cek Login
     public static boolean isValidLogin(String email, String password) {
@@ -90,12 +88,10 @@ public class UserManager {
         return accounts.containsKey(email);
     }
 
-    // Alias untuk konsistensi dengan UserInformation
     public static boolean accountExists(String email) {
         return isEmailTaken(email);
     }
 
-    // ========== ACCOUNT MANAGEMENT ==========
 
     // Tambah User Baru
     public static void registerUser(String email, String password, String fullName) {
@@ -104,7 +100,6 @@ public class UserManager {
         System.out.println("New user registered: " + email);
     }
 
-    // Alias untuk konsistensi dengan UserInformation
     public static void createAccount(String email, String password, String fullName) {
         registerUser(email, password, fullName);
     }
@@ -128,19 +123,17 @@ public class UserManager {
         return false;
     }
 
-    // ========== UTILITY METHODS ==========
 
-    // Get all accounts (jika diperlukan untuk debugging/admin)
+    // Get all accounts 
     public static Map<String, String[]> getAccounts() {
         return accounts;
     }
 
-    // Validasi lengkap untuk login (menggabungkan beberapa cek)
+    // Validasi lengkap untuk login 
     public static boolean validateLogin(String email, String password) {
         return isValidLogin(email, password);
     }
 
-    // Debug: Print semua akun (untuk testing)
     public static void printAllAccounts() {
         System.out.println("\n=== REGISTERED ACCOUNTS ===");
         if (accounts.isEmpty()) {

@@ -51,7 +51,7 @@ public class PieChartPanel extends JPanel {
 
         Set<Color> warnaTerpakai = new HashSet<>(warnaKategori.values());
 
-        int fallbackIndex = 0; // index cadangkan saat warna habis
+        int fallbackIndex = 0; 
         for (String kategori : dataKategori.keySet()) {
             if (!warnaKategori.containsKey(kategori)) {
                 Color warnaPilihan = null;

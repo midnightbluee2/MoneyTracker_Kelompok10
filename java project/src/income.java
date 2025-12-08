@@ -9,7 +9,6 @@ public class Income implements Serializable {
 
     public static List<Income> daftarIncomes = new ArrayList<>();
 
-    // Constructor
     public Income(String Tanggal, String Kategori, String Deskripsi, double Jumlah) {
         this.Tanggal = Tanggal;
         this.Kategori = Kategori;
@@ -17,7 +16,7 @@ public class Income implements Serializable {
         this.Jumlah = Jumlah;
     }
 
-    // ========== GETTER METHODS ==========
+    // getter
     public String getTanggal() {
         return this.Tanggal;
     }
@@ -33,9 +32,8 @@ public class Income implements Serializable {
     public double getJumlah() {
         return this.Jumlah;
     }
-    // ====================================
 
-    // ========== SETTER METHODS ==========
+    // setter
     public void setTanggal(String Tanggal) {
         this.Tanggal = Tanggal;
     }
@@ -51,7 +49,6 @@ public class Income implements Serializable {
     public void setJumlah(double Jumlah) {
         this.Jumlah = Jumlah;
     }
-    // ====================================
 
     // Static methods
     public static List<Income> getDaftarIncomes() {

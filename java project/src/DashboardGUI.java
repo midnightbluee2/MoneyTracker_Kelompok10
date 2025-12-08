@@ -47,7 +47,6 @@ public class DashboardGUI extends GradientColor {
         summary.add(Box.createVerticalStrut(1));
         summary.add(forAmount);
 
-        // reference untuk update 
         if (title.equals("Balance")) {
             balanceLabel = forAmount;
         } else if (title.equals("Income")) {
@@ -162,7 +161,7 @@ public class DashboardGUI extends GradientColor {
         titleChart.setBorder(new EmptyBorder(5, 0, 0, 0));
 
         // menampilkan panel pie chart
-        pieChart = new PieChartPanel("Expense Categories"); // panggil class
+        pieChart = new PieChartPanel("Expense Categories"); 
         pieChart.setAlignmentX(Component.CENTER_ALIGNMENT);
         pieChart.updateDataFromExpenses(Expense.getDaftarExpense());
 

@@ -18,7 +18,7 @@ public class RecentTransactionsPanel extends JPanel {
     // menyamakan format data Income & Expense
     private static class Transaction {
         String tanggal;
-        String tipe; // "Income" atau "Expense"
+        String tipe; 
         String kategori;
         double jumlah;
 
@@ -61,7 +61,6 @@ public class RecentTransactionsPanel extends JPanel {
         table.getTableHeader().setBackground(new Color(163, 181, 101));
         table.getTableHeader().setForeground(Color.WHITE);
 
-        // custom Cell Renderer untuk warna teks sesuai tipe (income atau expense)
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -92,7 +91,6 @@ public class RecentTransactionsPanel extends JPanel {
             }
         });
 
-        // atur lebar kolom
         table.getColumnModel().getColumn(0).setPreferredWidth(80); // Date
         table.getColumnModel().getColumn(1).setPreferredWidth(60); // Type
         table.getColumnModel().getColumn(2).setPreferredWidth(100); // Category
@@ -147,7 +145,7 @@ public class RecentTransactionsPanel extends JPanel {
         List<Transaction> allTransactions = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-        // ambil data dari EXPENSE (Sesuai file Expense.java kamu)
+        // ambil data dari EXPENSE 
         List<Expense> expenses = Expense.getDaftarExpense();
         if (expenses != null) {
             for (Expense exp : expenses) {
@@ -159,8 +157,8 @@ public class RecentTransactionsPanel extends JPanel {
             }
         }
 
-        // ambil data dari INCOME (Sesuai file Income.java kamu)
-        IncomeManager manager = IncomeManager.getInstance(); //  akses static list dari class Income
+        // ambil data dari INCOME
+        IncomeManager manager = IncomeManager.getInstance(); 
         if (manager != null) {
             ArrayList<Income> incomes = manager.ambilsemuaincome();
             if (incomes != null) {
@@ -175,21 +173,21 @@ public class RecentTransactionsPanel extends JPanel {
             }
         }
 
-        // sorting data berdasarkan Tanggal (terbaru ke terlama)
+        // sorting data berdasarkan Tanggal 
         Collections.sort(allTransactions, new Comparator<Transaction>() {
             @Override
             public int compare(Transaction t1, Transaction t2) {
                 try {
                     LocalDate d1 = LocalDate.parse(t1.tanggal, formatter);
                     LocalDate d2 = LocalDate.parse(t2.tanggal, formatter);
-                    return d2.compareTo(d1); // urutan descending (t2 banding t1)
+                    return d2.compareTo(d1); 
                 } catch (Exception e) {
-                    return 0; // diabaikan jika format tanggal error
+                    return 0; 
                 }
             }
         });
 
-        // membatasi jumlah data (Limit) sesuai parameter
+        // membatasi jumlah data
         if (allTransactions.size() > limit) {
             return allTransactions.subList(0, limit);
         }

@@ -32,7 +32,7 @@ public class GradientColor extends JPanel{
     public void setColors(Color top, Color bottom) {
         this.colorTop = top;
         this.colorBottom = bottom;
-        repaint(); // Gambar ulang panelnya
+        repaint(); 
     }
     
 }

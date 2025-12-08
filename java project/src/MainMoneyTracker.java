@@ -25,7 +25,7 @@ public class MainMoneyTracker extends JFrame {
 
         this.add(dashboard);
 
-        // Auto-save saat aplikasi ditutup
+        // Auto-save
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent e) {
@@ -45,7 +45,6 @@ public class MainMoneyTracker extends JFrame {
     public static void main(String[] args) {
         UserManager.loadUsers();
         SwingUtilities.invokeLater(() -> {
-            // testing - langsung ke dashboard tanpa login 
             String testUsername = JOptionPane.showInputDialog(
                 "Input Username (testing)");
             

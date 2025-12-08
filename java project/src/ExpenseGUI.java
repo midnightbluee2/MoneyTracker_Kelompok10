@@ -289,7 +289,7 @@ public class ExpenseGUI extends JFrame {
         return spinner;
     }
 
-    // kategori (combo box)
+    // kategori
     private JComboBox<String> createKategoriComboBox() {
         String[] kategori = {
             "Food & Beverage",
@@ -463,7 +463,7 @@ public class ExpenseGUI extends JFrame {
     }
 
     private void clearForm() {
-        dateSpinner.setValue(new Date()); // reset ke hari ini
+        dateSpinner.setValue(new Date());
         cmbKategori.setSelectedIndex(0);
         txtKategoriLain.setVisible(false);
         txtDeskripsi.setText("DESCRIPTION (Optional)");

@@ -270,8 +270,8 @@ public class MoneyTrackerLogin extends JFrame {
                 g2d.dispose();
             }
         };
-        card.setOpaque(true); // Ubah jadi true
-        card.setBackground(bgColor); // Set background color
+        card.setOpaque(true); 
+        card.setBackground(bgColor); 
         card.setBounds(x, y, 300, 420);
         card.setLayout(null);
         return card;
@@ -290,13 +290,10 @@ public class MoneyTrackerLogin extends JFrame {
         JTextField field = new JTextField() {
             @Override
             protected void paintComponent(Graphics g) {
-                // Paint solid background first
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setColor(getBackground());
                 g2d.fillRect(0, 0, getWidth(), getHeight());
                 g2d.dispose();
-                
-                // Then paint text
                 super.paintComponent(g);
             }
         };
@@ -321,7 +318,6 @@ public class MoneyTrackerLogin extends JFrame {
                 g2d.fillRect(0, 0, getWidth(), getHeight());
                 g2d.dispose();
                 
-                // Then paint password dots
                 super.paintComponent(g);
             }
         };
